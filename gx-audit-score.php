@@ -47,9 +47,24 @@ if (!function_exists('GX_Backend')) {
     }
 }
 
+
+// Rest API interface, features & hooks.
+if (!function_exists('GX_Api')) {
+    function GX_Api()
+    {   
+        return GX_Api::instance(__FILE__);
+    }
+}
+
 /**
  * Call backend functions
  */
 if (is_admin()) {
     GX_Backend();
 }
+
+/**
+ * Call API
+ * 
+ */
+GX_Api();

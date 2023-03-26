@@ -30,10 +30,6 @@
                   {
                       route: 'settings',
                       title: 'Settings'
-                  },
-                  {
-                      route: 'supports',
-                      title: 'Supports'
                   }
               ])
           }

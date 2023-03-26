@@ -52,11 +52,12 @@ import {
     DropdownMenu,
     Upload,
     Notification,
-    Card
+    Image
 } from 'element-ui';
 
+Vue.use(Image);
 Vue.use(Button);
-Vue.use(Card);
+
 Vue.use(Dropdown);
 Vue.use(Upload);
 Vue.use(DropdownItem);

@@ -2,8 +2,11 @@
     <div>
         <el-container>
             <el-header>
-                <h1>This is the plugin settings page</h1>
+                <h1>Settings</h1>
             </el-header>
+            <el-row>
+                
+            </el-row>
       </el-container>
     </div>
 </template>

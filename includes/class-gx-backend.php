@@ -230,24 +230,26 @@ class GX_Backend
         $table_charset = '';
         $prefix = $wpdb->prefix;
         $gx_table = $prefix . 'gx_audit';
-        if ($wpdb->has_cap('collation')) {
-            if (!empty($wpdb->charset)) {
-                $table_charset = "DEFAULT CHARACTER SET {$wpdb->charset}";
-            }
-            if (!empty($wpdb->collate)) {
-                $table_charset .= " COLLATE {$wpdb->collate}";
-            }
-        }
+        $charset_collate = $wpdb->get_charset_collate();
+
         $create_gx_table_sql = "CREATE TABLE {$gx_table} (
             id int(11) NOT NULL auto_increment,
+            name varchar(250) NOT NULL,
             user_id int(11) NOT NULL,
-            gx_values text NOT NULL,
+            location text NOT NULL,
+            gx_id varchar(200) NOT NULL,
+            type varchar(200) NOT NULL,
+            staff int(11) NOT NULL,
+            touch_points int(11) NOT NULL,
+            sector_number int(11) NOT NULL,
+            logourl text NOT NULL,
+            logoid int(11) NOT NULL,
+            items text NOT NULL,
             inserted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            PRIMARY KEY (id),
-            INDEX uid_index(user_id) ENGINE = MyISAM {$table_charset};";
+            PRIMARY KEY (id)) $charset_collate;";
 
-        maybe_create_table($gx_table, $create_gx_table_sql);
+            maybe_create_table($gx_table, $create_gx_table_sql);
     }
 
 
