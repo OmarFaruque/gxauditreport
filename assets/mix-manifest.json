@@ -1,5 +1,7 @@
 {
     "/js/boot.js": "/js/boot.js",
-    "/css/element.css": "/css/element.css",
-    "/js/gx-audit.js": "/js/gx-audit.js"
+    "/js/gx-audit.js": "/js/gx-audit.js",
+    "/js/gx-public-score-board.js": "/js/gx-public-score-board.js",
+    "/css/public-gx-score.css": "/css/public-gx-score.css",
+    "/css/element.css": "/css/element.css"
 }

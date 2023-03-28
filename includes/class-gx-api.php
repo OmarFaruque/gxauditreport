@@ -80,12 +80,35 @@ class GX_Api
                     )
                 );
 
+
+                // Frontend data load 
+                register_rest_route(
+                    $this->token . '/v1',
+                    '/frontend_config/',
+                    array(
+                        'methods' => 'POST',
+                        'callback' => array($this, 'gx_get_single_user_data'),
+                        'permission_callback' => array($this, 'getPermission'),
+                    )
+                );
+
             }
         );
 
         // add_action( 'wp_head', array($this, 'testF') );
     }
 
+
+
+    /**
+     * Get Single user data
+     */
+    public function gx_get_single_user_data($data){
+        $table = $this->wpdb->prefix . 'gx_audit';
+        $qry = $this->wpdb->prepare("SELECT * FROM {$table} WHERE `user_id`=%d", $data['id']);
+        $results = $this->wpdb->get_results($qry);
+        return new WP_REST_Response(array('results' => $results), 200);
+    }
 
 
     /**
@@ -119,7 +142,7 @@ class GX_Api
      */
     public function set_new_entry_to_db($data){
         $data = $data['data'];
-        $data['items'] = serialize($data['items']);
+        $data['items'] = json_encode($data['items']);
         if(isset($data['id']) && !empty($data['id'])){
             $id = (int)$data['id'];
             unset($data['id']);
@@ -152,7 +175,7 @@ class GX_Api
         $table = $this->wpdb->prefix . 'gx_audit';
         $qry = "SELECT * FROM {$table}";
         $data = $this->wpdb->get_results($qry, OBJECT);
-        foreach($data as $k => $s) $data[$k]->items = unserialize($s->items);
+        // foreach($data as $k => $s) $data[$k]->items = unserialize($s->items);
         return $data;
     }
 

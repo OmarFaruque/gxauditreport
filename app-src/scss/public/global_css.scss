@@ -1,0 +1,32 @@
+div#gx_scoreboard_app{max-width: unset;}
+.w-100{width: 100% !important;}
+.m-0{margin: 0;}
+.mt-0{margin-top: 0;}
+.mt-1{margin-top: 1rem;}
+.mt-2{margin-top: 2rem;}
+.mt-3{margin-top: 3rem;}
+.mb-0{margin-bottom: 0;}
+.mb-1{margin-bottom: 1rem;}
+
+.p-0{padding: 0;}
+.pt-0{padding-top: 0;}
+.lists-style-none{list-style: none;}
+.bg-blue{background-color: #0172e2;}
+.color-white{color: white;}
+h1.score{font-size: 70px;}
+.color-green{color: greenyellow;}
+.bg-yellow{background-color: #fdb345;}
+.border-0{border-width: 0;}
+.mw-100{max-width: 100%;}
+.border-rounded{border-radius: 500px;}
+.p-img{
+    .el-image{
+        overflow: hidden;
+        height: 250px;
+        width: 250px;
+        img{
+            max-width: 100%;
+            min-height: 100%;
+        }
+    }
+}

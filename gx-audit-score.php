@@ -56,6 +56,15 @@ if (!function_exists('GX_Api')) {
     }
 }
 
+
+// Frontend interface
+if (!function_exists('GX_Public')) {
+    function GX_Public()
+    {   
+        return GX_Public::instance(__FILE__);
+    }
+}
+
 /**
  * Call backend functions
  */
@@ -68,3 +77,8 @@ if (is_admin()) {
  * 
  */
 GX_Api();
+
+/**
+ * Call frontend features
+ */
+GX_Public();

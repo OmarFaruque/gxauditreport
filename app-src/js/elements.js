@@ -2,6 +2,7 @@ import Vue from 'vue';
 import lang from 'element-ui/lib/locale/lang/en';
 import locale from 'element-ui/lib/locale';
 
+
 import {
     Button,
     ButtonGroup,
@@ -52,12 +53,13 @@ import {
     DropdownMenu,
     Upload,
     Notification,
+    Card, 
     Image
 } from 'element-ui';
 
-Vue.use(Image);
+Vue.use(Card);
 Vue.use(Button);
-
+Vue.use(Image);
 Vue.use(Dropdown);
 Vue.use(Upload);
 Vue.use(DropdownItem);
@@ -104,6 +106,7 @@ Vue.use(Col);
 Vue.use(Transfer);
 Vue.use(DatePicker);
 Vue.use(Submenu);
+Vue.use(require('vue-moment'));
 
 Vue.use(Loading.directive);
 Vue.prototype.$loading = Loading.service;

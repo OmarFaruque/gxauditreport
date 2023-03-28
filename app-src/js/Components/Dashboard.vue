@@ -48,6 +48,28 @@
                     </el-form-item>
                 </el-col>
                 <el-col :span="12">
+                    <el-form-item label="Date" :label-width="formLabelWidth">
+                        <el-date-picker
+                            v-model="gx_lists[editItem].date"
+                            type="date"
+                            placeholder="Pick a day"
+                            class="w-100 max-100"
+                            :picker-options="pickerOptions">
+                        </el-date-picker>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+               <el-col :span="12">
+                    <el-form-item label="Logo" :label-width="formLabelWidth">
+                        <el-button
+                            class="avatar-uploader logo-upload" @click="wpMediaUpload()">
+                            <img v-if="gx_lists[editItem].logourl" :src="gx_lists[editItem].logourl" class="avatar">
+                            <i v-else class="el-icon-plus avatar-uploader-icon mw-100px mh-100px"></i>
+                        </el-button>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="12">
                     <el-form-item label="User" :label-width="formLabelWidth">
                         <el-select class="w-100" v-model="gx_lists[editItem].user_id" placeholder="Select">
                             <el-option
@@ -60,15 +82,6 @@
                     </el-form-item>
                 </el-col>
             </el-row>
-            <el-row>
-                <el-form-item label="Logo" :label-width="formLabelWidth">
-                    <el-button
-                        class="avatar-uploader logo-upload" @click="wpMediaUpload()">
-                        <img v-if="gx_lists[editItem].logourl" :src="gx_lists[editItem].logourl" class="avatar">
-                        <i v-else class="el-icon-plus avatar-uploader-icon mw-100px mh-100px"></i>
-                    </el-button>
-                </el-form-item>
-            </el-row>
 
             <el-row>
                 <el-table stripe :data="gx_lists[editItem].items">
@@ -80,21 +93,11 @@
                     </el-table-column>
                     <el-table-column label="Score">
                         <template slot-scope="scope">
-                           <el-input-number v-if="gx_lists[editItem].items[scope.$index].mode" v-model="gx_lists[editItem].items[scope.$index].score" :min="0" :max="100" :step="1"></el-input-number>
+                           <el-input-number class="w-100" v-if="gx_lists[editItem].items[scope.$index].mode" v-model="gx_lists[editItem].items[scope.$index].score" :min="0" :max="100" :step="1"></el-input-number>
                            <el-span v-else>{{ gx_lists[editItem].items[scope.$index].score }}</el-span>
                         </template>
                     </el-table-column>
-                    <el-table-column label="Date">
-                        <template slot-scope="scope">
-                            <el-date-picker
-                                v-model="gx_lists[editItem].items[scope.$index].date"
-                                type="date"
-                                placeholder="Pick a day"
-                                class="w-100 max-100"
-                                :picker-options="pickerOptions">
-                            </el-date-picker>
-                        </template>
-                    </el-table-column>
+                    
                     <el-table-column label="Operations">
                         <template slot-scope="scope">
                            <el-button type="primary" icon="el-icon-edit"></el-button>
@@ -113,10 +116,6 @@
         </span>
         </el-dialog>
         <!-- Modal End -->
-
-
-
-
         
         <!-- example content  start -->
         <el-container>
@@ -187,7 +186,7 @@
     </div>
 </template>
 <script>
-import { reactive } from 'vue'
+
 import FetchWP from '../utils/fetchWP'
 import MtcWordpressMediaLibrary from '@mtcmedia/vue-wordpress-media-library'
 
@@ -220,6 +219,7 @@ export default {
                 logourl: '',
                 logoid: '',
                 user_id: '',
+                date: new Date(),
                 items: []    
             }],
             editItem: 0,
@@ -255,6 +255,9 @@ export default {
         this.fetchWP.get(`config`)
         .then((response) => { 
             this.wp_users = response.wp_users 
+            response.gx_lists.map((v, k) => {
+                response.gx_lists[k].items = JSON.parse(v.items)
+            })
             this.gx_lists = response.gx_lists 
         })
     },

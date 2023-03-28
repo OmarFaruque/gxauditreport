@@ -122,7 +122,7 @@ class GX_Backend
         $this->script_suffix = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '' : '.min';
         $plugin = plugin_basename($this->file);
         
-        // Add woocommerce settings page to $hook_suffix 
+        // Add settings page to $hook_suffix 
         array_push($this->hook_suffix, 'gx-settings');
 
         // add action links to link to link list display on the plugins page.
@@ -245,6 +245,7 @@ class GX_Backend
             logourl text NOT NULL,
             logoid int(11) NOT NULL,
             items text NOT NULL,
+            date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             inserted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (id)) $charset_collate;";
