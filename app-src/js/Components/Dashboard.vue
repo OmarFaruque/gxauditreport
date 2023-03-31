@@ -4,74 +4,9 @@
         <el-dialog title="Guest Experience Score(GXS)" :visible.sync="modalStatus">
         <el-form :model="gx_lists[editItem]">
             <el-row>
-                 <el-col :span="12">
-                    <el-form-item label="Client Name" :label-width="formLabelWidth">
-                        <el-input v-model="gx_lists[editItem].name" autocomplete="off"></el-input>
-                    </el-form-item>
-                </el-col>
-                <el-col :span="12">
-                    <el-form-item label="Location" :label-width="formLabelWidth">
-                        <el-input v-model="gx_lists[editItem].location" autocomplete="off"></el-input>
-                    </el-form-item>    
-                </el-col>
-            </el-row>
-            
-            <el-row>
-                 <el-col :span="12">
-                    <el-form-item label="ID" :label-width="formLabelWidth">
-                        <el-input v-model="gx_lists[editItem].gx_id" autocomplete="off"></el-input>
-                    </el-form-item>
-                 </el-col>
-                 <el-col :span="12">
-                    <el-form-item label="Type" :label-width="formLabelWidth">
-                        <el-input v-model="gx_lists[editItem].type" autocomplete="off"></el-input>
-                    </el-form-item>
-                 </el-col>
-            </el-row>
-            <el-row>
-                 <el-col :span="12">
-                    <el-form-item label="Onsite Staff" :label-width="formLabelWidth">
-                        <el-input-number class="w-100" v-model="gx_lists[editItem].staff" autocomplete="off"></el-input-number>
-                    </el-form-item>
-                </el-col>
-                <el-col :span="12">
-                    <el-form-item label="Touch Points" :label-width="formLabelWidth">
-                        <el-input-number class="w-100" v-model="gx_lists[editItem].touch_points" autocomplete="off"></el-input-number>
-                    </el-form-item>
-                </el-col>
-            </el-row>
-            <el-row>
-                 <el-col :span="12">
-                    <el-form-item label="Sectors Numbers" :label-width="formLabelWidth">
-                        <el-input-number class="w-100" v-model="gx_lists[editItem].sector_number" autocomplete="off"></el-input-number>
-                        
-                    </el-form-item>
-                </el-col>
-                <el-col :span="12">
-                    <el-form-item label="Date" :label-width="formLabelWidth">
-                        <el-date-picker
-                            v-model="gx_lists[editItem].date"
-                            type="date"
-                            placeholder="Pick a day"
-                            class="w-100 max-100"
-                            :picker-options="pickerOptions">
-                        </el-date-picker>
-                    </el-form-item>
-                </el-col>
-            </el-row>
-            <el-row>
-               <el-col :span="12">
-                    <el-form-item label="Logo" :label-width="formLabelWidth">
-                        <el-button
-                            class="avatar-uploader logo-upload" @click="wpMediaUpload()">
-                            <img v-if="gx_lists[editItem].logourl" :src="gx_lists[editItem].logourl" class="avatar">
-                            <i v-else class="el-icon-plus avatar-uploader-icon mw-100px mh-100px"></i>
-                        </el-button>
-                    </el-form-item>
-                </el-col>
-                <el-col :span="12">
+                <el-col :span="8">
                     <el-form-item label="User" :label-width="formLabelWidth">
-                        <el-select class="w-100" v-model="gx_lists[editItem].user_id" placeholder="Select">
+                        <el-select @change="getOnlyUserDetails($event)" class="w-100" v-model="gx_lists[editItem].user_id" placeholder="Select">
                             <el-option
                             v-for="item in wp_users"
                             :key="item.id"
@@ -81,20 +16,93 @@
                         </el-select>
                     </el-form-item>
                 </el-col>
+                <el-col :span="8">
+                     <el-form-item label="Date" :label-width="formLabelWidth">
+                        <el-date-picker
+                            v-model="gx_lists[editItem].date"
+                            type="date"
+                            placeholder="Pick a day"
+                            class="w-100 max-100"
+                            :picker-options="pickerOptions">
+                        </el-date-picker>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                    <el-form-item label="Excel" :label-width="formLabelWidth">
+                        <el-button @click="excelFileUpload()" class="upload-demo mw-100 excel-upload">
+                            <i v-if="gx_lists[editItem].excel" class="el-icon-document-remove"></i>
+                            <i v-else class="el-icon-upload"></i>
+                        </el-button>
+                    </el-form-item>
+                    
+                </el-col>
             </el-row>
+
+            <el-collapse v-if="gx_lists[editItem].user_id" v-model="activePersonalInformation" >
+                <el-collapse-item title="User Details" name="1">
+                    <el-row style="margin-right: 1px;">
+                        <el-col :span="12">
+                            <el-form-item label="Client Name" :label-width="formLabelWidth">
+                                <el-input v-model="gx_lists[editItem].name" autocomplete="off"></el-input>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="Location" :label-width="formLabelWidth">
+                                <el-input v-model="gx_lists[editItem].location" autocomplete="off"></el-input>
+                            </el-form-item>    
+                        </el-col>
+                    </el-row>
+                    
+                    <el-row style="margin-right: 1px;">
+                        <el-col :span="12">
+                            <el-form-item label="ID" :label-width="formLabelWidth">
+                                <el-input v-model="gx_lists[editItem].gx_id" autocomplete="off"></el-input>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="Type" :label-width="formLabelWidth">
+                                <el-input v-model="gx_lists[editItem].type" autocomplete="off"></el-input>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row style="margin-right: 1px;">
+                        <el-col :span="12">
+                            <el-form-item label="Onsite Staff" :label-width="formLabelWidth">
+                                <el-input-number class="w-100" v-model="gx_lists[editItem].staff" autocomplete="off"></el-input-number>
+                            </el-form-item>
+                             <el-form-item label="Sectors Numbers" :label-width="formLabelWidth">
+                                <el-input-number class="w-100" v-model="gx_lists[editItem].sector_number" autocomplete="off"></el-input-number>
+                            </el-form-item>
+                            <el-form-item label="Touch Points" :label-width="formLabelWidth">
+                                <el-input-number class="w-100" v-model="gx_lists[editItem].touch_points" autocomplete="off"></el-input-number>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                           <el-form-item label="Logo" :label-width="formLabelWidth">
+                                <el-button
+                                    class="avatar-uploader logo-upload" @click="wpMediaUpload()">
+                                    <img v-if="gx_lists[editItem].logourl" :src="gx_lists[editItem].logourl" class="avatar">
+                                    <i v-else class="el-icon-plus avatar-uploader-icon mw-100px mh-100px"></i>
+                                </el-button>
+                            </el-form-item> 
+                        </el-col>
+                    </el-row>
+ 
+                </el-collapse-item>
+            </el-collapse>
 
             <el-row>
                 <el-table stripe :data="gx_lists[editItem].items">
                     <el-table-column label="Name">
                         <template slot-scope="scope">
                            <el-input v-if="gx_lists[editItem].items[scope.$index].mode" v-model="gx_lists[editItem].items[scope.$index].name" />
-                           <el-span v-else>{{ gx_lists[editItem].items[scope.$index].name }}</el-span>
+                           <span v-else>{{ gx_lists[editItem].items[scope.$index].name }}</span>
                         </template>
                     </el-table-column>
                     <el-table-column label="Score">
                         <template slot-scope="scope">
                            <el-input-number class="w-100" v-if="gx_lists[editItem].items[scope.$index].mode" v-model="gx_lists[editItem].items[scope.$index].score" :min="0" :max="100" :step="1"></el-input-number>
-                           <el-span v-else>{{ gx_lists[editItem].items[scope.$index].score }}</el-span>
+                           <span v-else>{{ gx_lists[editItem].items[scope.$index].score }}</span>
                         </template>
                     </el-table-column>
                     
@@ -157,6 +165,18 @@
                             label="Name"
                             width="180">
                         </el-table-column>
+
+                        <el-table-column
+                            prop="user_id"
+                            label="User"
+                            width="180">
+                            <template slot-id="id" slot-scope="scope">
+                                <span v-if="wp_users.findIndex(x => x.id == scope.row.user_id) > -1">
+                                    {{ wp_users[wp_users.findIndex(x => x.id == scope.row.user_id)].name   }}
+                                </span>
+                                
+                            </template>
+                        </el-table-column>
                         
                         <el-table-column
                             prop="location"
@@ -169,6 +189,12 @@
                         <el-table-column
                             prop="touch_points"
                             label="Touch Point">
+                        </el-table-column>
+                        <el-table-column
+                            label="Date">
+                            <template slot-scope="scope">
+                                <span>{{ scope.row.date | moment("Do MMMM, YYYY") }}</span>
+                            </template>
                         </el-table-column>
                         <el-table-column
                             label="Operations" 
@@ -200,7 +226,7 @@ export default {
     },
     data(){
         return {
-            vueJs: 'https://vuejs.org/', 
+            activePersonalInformation: [],
             formLabelWidth: '140px',
             fetchWP: new FetchWP({
                     restURL: window.gx_object.root,
@@ -218,9 +244,10 @@ export default {
                 sector_number: 0,
                 logourl: '',
                 logoid: '',
-                user_id: '',
+                user_id: 0,
                 date: new Date(),
-                items: []    
+                items: [], 
+                excel: ''
             }],
             editItem: 0,
             modalStatus: false,
@@ -231,7 +258,7 @@ export default {
                 shortcuts: [{
                     text: 'Today',
                     onClick(picker) {
-                    picker.$emit('pick', new Date());
+                        picker.$emit('pick', new Date());
                     }
                 }, {
                     text: 'Yesterday',
@@ -258,10 +285,28 @@ export default {
             response.gx_lists.map((v, k) => {
                 response.gx_lists[k].items = JSON.parse(v.items)
             })
-            this.gx_lists = response.gx_lists 
+            if(response.gx_lists.length) this.gx_lists = response.gx_lists 
         })
+        .catch(error => {
+            console.log('error is: ', error)
+        })
+       
     },
     methods: {
+        getOnlyUserDetails(v){
+            this.fetchWP.post(`get_user_details`, {id: v})
+            .then( (response) => { 
+                this.gx_lists[this.editItem].name           = response.users.name
+                this.gx_lists[this.editItem].location       = response.users.location
+                this.gx_lists[this.editItem].gx_id          = response.users.gx_id
+                this.gx_lists[this.editItem].type           = response.users.type
+                this.gx_lists[this.editItem].staff          = response.users.staff
+                this.gx_lists[this.editItem].logoid         = response.users.logoid
+                this.gx_lists[this.editItem].logourl        = response.users.logourl
+                this.gx_lists[this.editItem].sector_number  = response.users.sector_number
+                this.gx_lists[this.editItem].touch_points   = response.users.touch_points
+            })
+        },
         onOpenNewEntry() {
             let newItem = {
                 name: '',
@@ -274,7 +319,8 @@ export default {
                 logourl: '',
                 logoid: '',
                 user_id: '',
-                items: []    
+                items: [],
+                excel: ''    
             }
           this.modalStatus = this.modalStatus ? false : true
           this.gx_lists = [...this.gx_lists, ...[newItem]]
@@ -286,10 +332,16 @@ export default {
         handleDownload () {
 
         }, 
+        excelFileUpload(){
+            var self = this;
+            wp.media.editor.send.attachment = function (props, attachment) {
+                self.gx_lists[self.editItem].excel = attachment.url
+            };
+            wp.media.editor.open();
+        }, 
         wpMediaUpload () {
             var self = this;
             wp.media.editor.send.attachment = function (props, attachment) {
-                // console.log('self: ', self.gx_lists, 'this edit item: ', self.editItem)
                 self.gx_lists[self.editItem].logourl = attachment.url
                 self.gx_lists[self.editItem].logoid = attachment.id
             };
@@ -305,7 +357,7 @@ export default {
         submitForm(){
             this.fetchWP.post(`new_entry`, {data: this.gx_lists[this.editItem]})
             .then( (response) => { 
-                // console.log('entry successfully: ', response) 
+                
                 this.modalStatus = this.modalStatus ? false : true
             })
         },

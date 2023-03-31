@@ -234,16 +234,8 @@ class GX_Backend
 
         $create_gx_table_sql = "CREATE TABLE {$gx_table} (
             id int(11) NOT NULL auto_increment,
-            name varchar(250) NOT NULL,
             user_id int(11) NOT NULL,
-            location text NOT NULL,
-            gx_id varchar(200) NOT NULL,
-            type varchar(200) NOT NULL,
-            staff int(11) NOT NULL,
-            touch_points int(11) NOT NULL,
-            sector_number int(11) NOT NULL,
-            logourl text NOT NULL,
-            logoid int(11) NOT NULL,
+            excel text NOT NULL,
             items text NOT NULL,
             date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             inserted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

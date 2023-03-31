@@ -92,22 +92,88 @@ class GX_Api
                     )
                 );
 
+                //User meta details
+                register_rest_route(
+                    $this->token . '/v1',
+                    '/get_user_details/',
+                    array(
+                        'methods' => 'POST',
+                        'callback' => array($this, 'gx_get_single_user_metadata'),
+                        'permission_callback' => array($this, 'getPermission'),
+                    )
+                );
+
             }
         );
 
         // add_action( 'wp_head', array($this, 'testF') );
     }
 
+    public function testF(){
+        $id = 1;
+        $config = $this->getConfig();
 
+        echo 'return array <br/><pre>';
+        print_r($config);
+        echo '</pre>';
+    }
+
+
+
+    /**
+     * Get single user meta data for backend
+     */
+    public function gx_get_single_user_metadata($data){
+        $user_id = $data['id'];
+        $v = new stdClass();
+        $v->name = get_user_meta( $user_id, 'name', true );
+        $v->location = get_user_meta( $user_id, 'location', true );
+        $v->gx_id = get_user_meta( $user_id, 'gx_id', true );
+        $v->type = get_user_meta( $user_id, 'type', true );
+        $v->staff = get_user_meta( $user_id, 'staff', true );
+        $v->touch_points = get_user_meta( $user_id, 'touch_points', true );
+        $v->sector_number = get_user_meta( $user_id, 'sector_number', true );
+        $v->logourl = get_user_meta( $user_id, 'logourl', true );
+        $v->logoid = get_user_meta( $user_id, 'logoid', true );
+        return new WP_REST_Response(array('users' => $v, 'id' => $user_id), 200);
+    }
 
     /**
      * Get Single user data
      */
     public function gx_get_single_user_data($data){
         $table = $this->wpdb->prefix . 'gx_audit';
+        $start_date = $data['start_date'];
+        $end_date = $data['end_date'];
+
         $qry = $this->wpdb->prepare("SELECT * FROM {$table} WHERE `user_id`=%d", $data['id']);
+        $msg = '';
+        if(!is_null($start_date)){
+            date_default_timezone_set("Asia/Dhaka");
+
+            $msg='inside';
+            $start_date     = date('Y-m-d', strtotime($start_date));
+            $end_date       = date('Y-m-d', strtotime($end_date));
+
+            $qry .= $this->wpdb->prepare(" AND DATE(`date`) = %s OR DATE(`date`)=%s", $start_date, $end_date);    
+        }
+        $qry .= $this->wpdb->prepare(" ORDER BY `date` ASC LIMIT 2");
+
         $results = $this->wpdb->get_results($qry);
-        return new WP_REST_Response(array('results' => $results), 200);
+        $results = array_map(function($v){
+            $v->name = get_user_meta( $v->user_id, 'name', true );
+            $v->location = get_user_meta( $v->user_id, 'location', true );
+            $v->gx_id = get_user_meta( $v->user_id, 'gx_id', true );
+            $v->type = get_user_meta( $v->user_id, 'type', true );
+            $v->staff = get_user_meta( $v->user_id, 'staff', true );
+            $v->touch_points = get_user_meta( $v->user_id, 'touch_points', true );
+            $v->sector_number = get_user_meta( $v->user_id, 'sector_number', true );
+            $v->logourl = get_user_meta( $v->user_id, 'logourl', true );
+            $v->logoid = get_user_meta( $v->user_id, 'logoid', true );
+            return $v;
+        }, $results);
+
+        return new WP_REST_Response(array('results' => $results, 'qry' => $qry, 'start_date' => $start_date, 'endDate' => $end_date), 200);
     }
 
 
@@ -143,11 +209,41 @@ class GX_Api
     public function set_new_entry_to_db($data){
         $data = $data['data'];
         $data['items'] = json_encode($data['items']);
+
+        // Update user meta
+        if(isset($data['user_id']) && !empty($data['user_id'])){
+            $user_id = $data['user_id'];
+            update_user_meta( $user_id, 'name', $data['name'] );
+            update_user_meta( $user_id, 'location', $data['location'] );
+            update_user_meta( $user_id, 'gx_id', $data['gx_id'] );
+            update_user_meta( $user_id, 'type', $data['type'] );
+            update_user_meta( $user_id, 'staff', $data['staff'] );
+            update_user_meta( $user_id, 'touch_points', $data['touch_points'] );
+            update_user_meta( $user_id, 'sector_number', $data['sector_number'] );
+            update_user_meta( $user_id, 'logourl', $data['logourl'] );
+            update_user_meta( $user_id, 'logoid', $data['logoid'] );
+        }
+
+        unset($data['location']);
+        unset($data['gx_id']);
+        unset($data['type']);
+        unset($data['staff']);
+        unset($data['touch_points']);
+        unset($data['sector_number']);
+        unset($data['logourl']);
+        unset($data['logoid']);
+        unset($data['name']);
+        
+
+
+
+
         if(isset($data['id']) && !empty($data['id'])){
             $id = (int)$data['id'];
             unset($data['id']);
             unset($data['inserted_at']);
             unset($data['updated_at']);
+
             $this->wpdb->update(
                 $this->wpdb->prefix . 'gx_audit',
                 $data, 
@@ -175,7 +271,19 @@ class GX_Api
         $table = $this->wpdb->prefix . 'gx_audit';
         $qry = "SELECT * FROM {$table}";
         $data = $this->wpdb->get_results($qry, OBJECT);
-        // foreach($data as $k => $s) $data[$k]->items = unserialize($s->items);
+
+        $data = array_map(function($v){
+            $v->name = get_user_meta( $v->user_id, 'name', true );
+            $v->location = get_user_meta( $v->user_id, 'location', true );
+            $v->gx_id = get_user_meta( $v->user_id, 'gx_id', true );
+            $v->type = get_user_meta( $v->user_id, 'type', true );
+            $v->staff = get_user_meta( $v->user_id, 'staff', true );
+            $v->touch_points = get_user_meta( $v->user_id, 'touch_points', true );
+            $v->sector_number = get_user_meta( $v->user_id, 'sector_number', true );
+            $v->logourl = get_user_meta( $v->user_id, 'logourl', true );
+            $v->logoid = get_user_meta( $v->user_id, 'logoid', true );
+            return $v;
+        }, $data);
         return $data;
     }
 
