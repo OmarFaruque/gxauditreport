@@ -103,19 +103,55 @@ class GX_Api
                     )
                 );
 
+
+                // Update Settings 
+                register_rest_route(
+                    $this->token . '/v1',
+                    '/update_settings/',
+                    array(
+                        'methods' => 'POST',
+                        'callback' => array($this, 'gx_update_settings'),
+                        'permission_callback' => array($this, 'getPermission'),
+                    )
+                );
+
+
+                // Get Settings data
+                register_rest_route(
+                    $this->token . '/v1',
+                    '/update_settings/',
+                    array(
+                        'methods' => 'GET',
+                        'callback' => array($this, 'gx_get_settings'),
+                        'permission_callback' => function(){return true;},
+                    )
+                );
+
             }
         );
 
-        // add_action( 'wp_head', array($this, 'testF') );
+        
     }
 
-    public function testF(){
-        $id = 1;
-        $config = $this->getConfig();
 
-        echo 'return array <br/><pre>';
-        print_r($config);
-        echo '</pre>';
+    /**
+     * Get settings data 
+     * Query from options table 
+     * Request process from settings tab 
+     */
+    function gx_get_settings(){
+        $msg = get_option( 'gx_display_message');
+        return new WP_REST_Response(array('gx_display_message' => $msg), 200);
+    }
+
+    /**
+     * Update settings from Settings tab 
+     * Store data to options table
+     */
+    public function gx_update_settings($data){
+        $gx_msg = $data['gx_display_message'];
+        update_option( 'gx_display_message', $gx_msg, true );
+        return new WP_REST_Response(array('msg' => 'success'), 200);        
     }
 
 
@@ -145,11 +181,21 @@ class GX_Api
         $table = $this->wpdb->prefix . 'gx_audit';
         $start_date = $data['start_date'];
         $end_date = $data['end_date'];
+        date_default_timezone_set("Asia/Dhaka");
 
         $qry = $this->wpdb->prepare("SELECT * FROM {$table} WHERE `user_id`=%d", $data['id']);
+
+        $availableDates = $this->wpdb->get_results($qry, OBJECT);
+        $availableDates = array_map(function($v){
+            return array(
+                'value' => $v->date, 
+                'label' => date('jS F, Y', strtotime($v->date))
+            );
+        }, $availableDates);
+
         $msg = '';
         if(!is_null($start_date)){
-            date_default_timezone_set("Asia/Dhaka");
+            
 
             $msg='inside';
             $start_date     = date('Y-m-d', strtotime($start_date));
@@ -173,7 +219,7 @@ class GX_Api
             return $v;
         }, $results);
 
-        return new WP_REST_Response(array('results' => $results, 'qry' => $qry, 'start_date' => $start_date, 'endDate' => $end_date), 200);
+        return new WP_REST_Response(array('available_dates' => $availableDates, 'results' => $results, 'gx_display_message' => get_option( 'gx_display_message', false )), 200);
     }
 
 
@@ -207,8 +253,10 @@ class GX_Api
      * @return  success message
      */
     public function set_new_entry_to_db($data){
+        date_default_timezone_set("Asia/Dhaka");
         $data = $data['data'];
         $data['items'] = json_encode($data['items']);
+        $data['date'] = date('Y-m-d', strtotime($data['date']));
 
         // Update user meta
         if(isset($data['user_id']) && !empty($data['user_id'])){

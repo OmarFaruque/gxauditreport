@@ -29,6 +29,9 @@
 
 .avatar-uploader{
     border-style: dashed;
+    object-fit: contain;
+    max-height: 120px;
+    padding: 0;
 }
 .avatar-uploader .el-upload {
     border: 1px dashed #d9d9d9;
@@ -49,8 +52,9 @@
     text-align: center;
   }
   .avatar {
-    width: auto;
-    height: 178px;
+    width: 100%;
+    max-height: 115px;
+    height: auto;
     display: block;
     max-width: 100%;
   }

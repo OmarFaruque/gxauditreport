@@ -1,11 +1,12 @@
 <template>
     <div>
         <!-- New Entry modal-->
-        <el-dialog title="Guest Experience Score(GXS)" :visible.sync="modalStatus">
-        <el-form :model="gx_lists[editItem]">
+        <el-dialog  title="Guest Experience Score(GXS)" :visible.sync="modalStatus">
+        <el-form v-loading="loading" v-if="gx_lists[editItem]" :model="gx_lists[editItem]">
             <el-row>
-                <el-col :span="8">
-                    <el-form-item label="User" :label-width="formLabelWidth">
+                <el-col :span="12">
+                    <h4 class="mt-0">GXS Information</h4>
+                    <el-form-item label="User" :label-width="formLabelInlineW">
                         <el-select @change="getOnlyUserDetails($event)" class="w-100" v-model="gx_lists[editItem].user_id" placeholder="Select">
                             <el-option
                             v-for="item in wp_users"
@@ -15,9 +16,7 @@
                             </el-option>
                         </el-select>
                     </el-form-item>
-                </el-col>
-                <el-col :span="8">
-                     <el-form-item label="Date" :label-width="formLabelWidth">
+                    <el-form-item label="Date" :label-width="formLabelInlineW">
                         <el-date-picker
                             v-model="gx_lists[editItem].date"
                             type="date"
@@ -26,17 +25,27 @@
                             :picker-options="pickerOptions">
                         </el-date-picker>
                     </el-form-item>
-                </el-col>
-                <el-col :span="8">
-                    <el-form-item label="Excel" :label-width="formLabelWidth">
+                    <el-form-item label="Excel" :label-width="formLabelInlineW">
                         <el-button @click="excelFileUpload()" class="upload-demo mw-100 excel-upload">
                             <i v-if="gx_lists[editItem].excel" class="el-icon-document-remove"></i>
                             <i v-else class="el-icon-upload"></i>
                         </el-button>
                     </el-form-item>
-                    
+                </el-col>
+                <el-col :span="12">
+                    <h4 class="mt-0">Social Reviews</h4>
+                    <el-form-item label="Facebook" :label-width="formLabelInlineW">
+                        <el-input-number class="w-100" v-model="gx_lists[editItem].fb_score" placeholder="FB Score"></el-input-number>
+                    </el-form-item> 
+                    <el-form-item label="Wongnai" :label-width="formLabelInlineW">
+                        <el-input-number v-model="gx_lists[editItem].wn_score" placeholder="WN Score" class="w-100 max-100"> </el-input-number>
+                    </el-form-item>
+                    <el-form-item label="Google" :label-width="formLabelInlineW">
+                        <el-input-number v-model="gx_lists[editItem].google_score" placeholder="Google Score" class="w-100 max-100"> </el-input-number>
+                    </el-form-item>
                 </el-col>
             </el-row>
+
 
             <el-collapse v-if="gx_lists[editItem].user_id" v-model="activePersonalInformation" >
                 <el-collapse-item title="User Details" name="1">
@@ -92,23 +101,21 @@
             </el-collapse>
 
             <el-row>
-                <el-table stripe :data="gx_lists[editItem].items">
-                    <el-table-column label="Name">
+                <el-table stripe :data="gx_lists[editItem].items" style="width: 100%">
+                    <el-table-column  label="Name">
                         <template slot-scope="scope">
-                           <el-input v-if="gx_lists[editItem].items[scope.$index].mode" v-model="gx_lists[editItem].items[scope.$index].name" />
-                           <span v-else>{{ gx_lists[editItem].items[scope.$index].name }}</span>
+                           <el-input v-model="gx_lists[editItem].items[scope.$index].name" />
                         </template>
                     </el-table-column>
-                    <el-table-column label="Score">
+                    <el-table-column label="Score" width="200">
                         <template slot-scope="scope">
-                           <el-input-number class="w-100" v-if="gx_lists[editItem].items[scope.$index].mode" v-model="gx_lists[editItem].items[scope.$index].score" :min="0" :max="100" :step="1"></el-input-number>
-                           <span v-else>{{ gx_lists[editItem].items[scope.$index].score }}</span>
+                           <el-input-number class="w-100" v-model="gx_lists[editItem].items[scope.$index].score" :min="0" :max="100" :step="1"></el-input-number>
                         </template>
                     </el-table-column>
                     
-                    <el-table-column label="Operations">
+                    <el-table-column width="100" label="Operations">
                         <template slot-scope="scope">
-                           <el-button type="primary" icon="el-icon-edit"></el-button>
+                           <!-- <el-button type="primary" icon="el-icon-edit"></el-button> -->
                            <el-button @click="remoteItem(scope.$index)" type="danger" icon="el-icon-delete"></el-button>
                         </template>
                     </el-table-column>
@@ -120,7 +127,7 @@
             </el-row>
         </el-form>
         <span slot="footer" class="dialog-footer">
-            <el-button type="primary" @click="submitForm()">Submit</el-button>
+            <el-button v-if="!loading" type="primary" @click="submitForm()">Submit</el-button>
         </span>
         </el-dialog>
         <!-- Modal End -->
@@ -227,28 +234,16 @@ export default {
     data(){
         return {
             activePersonalInformation: [],
+            loading: false,
             formLabelWidth: '140px',
+            formLabelInlineW: '100px',
             fetchWP: new FetchWP({
                     restURL: window.gx_object.root,
                     restNonce: window.gx_object.api_nonce,
 
             }),
             wp_users:[],
-            gx_lists:[{
-                name: '',
-                location: '',
-                gx_id: '',
-                type: '',
-                staff: 0,
-                touch_points: 0,
-                sector_number: 0,
-                logourl: '',
-                logoid: '',
-                user_id: 0,
-                date: new Date(),
-                items: [], 
-                excel: ''
-            }],
+            gx_lists:[],
             editItem: 0,
             modalStatus: false,
             pickerOptions: {
@@ -355,9 +350,10 @@ export default {
             this.gx_lists[this.editItem].items.splice(index, 1)
         }, 
         submitForm(){
+            this.loading = true
             this.fetchWP.post(`new_entry`, {data: this.gx_lists[this.editItem]})
             .then( (response) => { 
-                
+                this.loading = false
                 this.modalStatus = this.modalStatus ? false : true
             })
         },

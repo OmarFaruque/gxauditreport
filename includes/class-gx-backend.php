@@ -206,7 +206,7 @@ class GX_Backend
     public function pluginActionLinks($links)
     {
         $action_links = array(
-            'settings' => '<a href="' . admin_url('admin.php?page=' . $this->token) . '">'
+            'settings' => '<a href="' . admin_url('admin.php?page=' . $this->token) . '-audit">'
                 . __('Configure', 'gx-audit') . '</a>'
         );
 
@@ -236,6 +236,9 @@ class GX_Backend
             id int(11) NOT NULL auto_increment,
             user_id int(11) NOT NULL,
             excel text NOT NULL,
+            fb_score int(50) NOT NULL, 
+            wn_score int(50) NOT NULL, 
+            google_score int(50) NOT NULL,
             items text NOT NULL,
             date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             inserted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

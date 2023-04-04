@@ -184,8 +184,7 @@ class GX_Public
                 'root' => rest_url($this->token . '/v1/'),
                 'assets_url' => $this->assets_url,
                 'base_url' => get_admin_url( '/' ), 
-                'user_id' => get_current_user_id(  )
-
+                'user_id' => get_current_user_id()
             )
         );
         

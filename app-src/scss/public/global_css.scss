@@ -11,55 +11,56 @@ div#gx_scoreboard_app{max-width: unset;}
 .p-0{padding: 0;}
 .pt-0{padding-top: 0;}
 .lists-style-none{list-style: none;}
-.bg-blue{background-color: #0172e2;}
+.bg-blue{background-color: #529CFD;}
 .text-white, .color-white{color: white;}
 .text-uppercase{text-transform: uppercase;}
-h1.score{font-size: 70px;}
+h2.score, h1.score, h3.score{font-size: 70px;}
 .color-green{color: greenyellow;}
-.bg-yellow{background-color: #fdb345;}
+.bg-yellow{background-color: #FFC207;}
 .border-0{border-width: 0;}
 .mw-100{max-width: 100%;}
 .border-rounded{border-radius: 500px;}
 .item-center{align-items: center;}
+.text-center{text-align: center;}
+button[type=button].download-btn:hover{
+    border-color: transparent;
+}
+button[type=button],
+.border-white{border-color: white;}
+button[type=button].download-btn{
+    color: white;
+}
 
 .p-img{
     .el-image{
         overflow: hidden;
-        height: 250px;
         width: 250px;
         img{
             max-width: 100%;
-            min-height: 100%;
         }
     }
 }
 .socialWrap{
     .bg-social-img{
         width: 100%;
-        height: 100px;
+        height: 80px;
         display: block;
         background-repeat: no-repeat;
-        background-position: right 0%;
-    }
-    
-    >div.item-center{
-        &:nth-child(2){
-            >div{
-                div.bg-social-img{
-                    background-position: right 50%;       
-                }
-            }
-        }
-        &:last-child{
-            >div{
-                div.bg-social-img{
-                    background-position: right 100%;       
-                }
-            }
-        }
+        background-position: center;
+        background-size: 73px;
     }
 }
 
 .score-card {
-    min-height: 225px;
+    min-height: 215px;
+    height: 215px;
+}
+
+//Responseive 
+@media screen and (max-width: 540px) {
+    .mt-xs-1{margin-top: 1rem;}
+    .mt-xs-2{margin-top: 2rem;}
+    .socialWrap .bg-social-img{
+        background-size: 90px;
+    }
 }
