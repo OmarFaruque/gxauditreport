@@ -130,7 +130,18 @@ class GX_Api
             }
         );
 
-        
+
+        // add_action( 'wp_head', function(){
+
+        //     $table = $this->wpdb->prefix . 'gx_audit';
+        //     $qry = $this->wpdb->prepare("SELECT `items` FROM {$table} WHERE `user_id`=%d ORDER BY `id` ASC LIMIT 1", 1);
+        //     $data = $this->wpdb->get_row($qry, OBJECT);
+
+        //     echo 'data array <pre>';
+        //     print_r($data);
+        //     echo '</pre>';
+        // } );
+
     }
 
 
@@ -171,7 +182,14 @@ class GX_Api
         $v->sector_number = get_user_meta( $user_id, 'sector_number', true );
         $v->logourl = get_user_meta( $user_id, 'logourl', true );
         $v->logoid = get_user_meta( $user_id, 'logoid', true );
-        return new WP_REST_Response(array('users' => $v, 'id' => $user_id), 200);
+
+        $table = $this->wpdb->prefix . 'gx_audit';
+        $qry = $this->wpdb->prepare("SELECT `items`, `socials` FROM {$table} WHERE `user_id`=%d ORDER BY `id` ASC LIMIT 1", $user_id);
+        $dataqry = $this->wpdb->get_row($qry, OBJECT);
+        $items = '';
+        if($dataqry) $items = json_decode($dataqry->items);
+        if($dataqry) $socials = json_decode($dataqry->socials);
+        return new WP_REST_Response(array('users' => $v, 'items' => $items, 'socials' => $socials), 200);
     }
 
     /**
@@ -206,7 +224,8 @@ class GX_Api
         $qry .= $this->wpdb->prepare(" ORDER BY `date` ASC LIMIT 2");
 
         $results = $this->wpdb->get_results($qry);
-        $results = array_map(function($v){
+        $socialArray = array();
+        $results = array_map(function($v) use ($socialArray){
             $v->name = get_user_meta( $v->user_id, 'name', true );
             $v->location = get_user_meta( $v->user_id, 'location', true );
             $v->gx_id = get_user_meta( $v->user_id, 'gx_id', true );
@@ -216,10 +235,19 @@ class GX_Api
             $v->sector_number = get_user_meta( $v->user_id, 'sector_number', true );
             $v->logourl = get_user_meta( $v->user_id, 'logourl', true );
             $v->logoid = get_user_meta( $v->user_id, 'logoid', true );
+            $v->socials = json_decode($v->socials);
             return $v;
         }, $results);
 
-        return new WP_REST_Response(array('available_dates' => $availableDates, 'results' => $results, 'gx_display_message' => get_option( 'gx_display_message', false )), 200);
+        // Social process 
+        foreach($results as $k => $sr){
+            foreach($sr->socials as $s){
+                if(!isset($socialArray[$s->label])) $socialArray[$s->label] = array(0 => 0, 1 => 0);
+                $socialArray[$s->label][$k] = $s->value;
+            }
+        }
+       
+        return new WP_REST_Response(array('available_dates' => $availableDates, 'results' => $results, 'gx_display_message' => get_option( 'gx_display_message', false ), 'socials' => $socialArray), 200);
     }
 
 
@@ -256,6 +284,7 @@ class GX_Api
         date_default_timezone_set("Asia/Dhaka");
         $data = $data['data'];
         $data['items'] = json_encode($data['items']);
+        $data['socials'] = json_encode($data['socials']);
         $data['date'] = date('Y-m-d', strtotime($data['date']));
 
         // Update user meta
@@ -282,9 +311,6 @@ class GX_Api
         unset($data['logoid']);
         unset($data['name']);
         
-
-
-
 
         if(isset($data['id']) && !empty($data['id'])){
             $id = (int)$data['id'];

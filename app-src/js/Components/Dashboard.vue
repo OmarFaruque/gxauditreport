@@ -3,16 +3,16 @@
         <!-- New Entry modal-->
         <el-dialog  title="Guest Experience Score(GXS)" :visible.sync="modalStatus">
         <el-form v-loading="loading" v-if="gx_lists[editItem]" :model="gx_lists[editItem]">
-            <el-row>
+            <el-row type="flex" :gutter="20">
                 <el-col :span="12">
                     <h4 class="mt-0">GXS Information</h4>
                     <el-form-item label="User" :label-width="formLabelInlineW">
-                        <el-select @change="getOnlyUserDetails($event)" class="w-100" v-model="gx_lists[editItem].user_id" placeholder="Select">
+                        <el-select  @change="getOnlyUserDetails($event)" class="w-100" v-model="gx_lists[editItem].user_id" placeholder="Select">
                             <el-option
-                            v-for="item in wp_users"
-                            :key="item.id"
-                            :label="item.name"
-                            :value="item.id">
+                                v-for="item in wp_users"
+                                :key="item.id"
+                                :label="item.name"
+                                :value="item.id">
                             </el-option>
                         </el-select>
                     </el-form-item>
@@ -34,15 +34,29 @@
                 </el-col>
                 <el-col :span="12">
                     <h4 class="mt-0">Social Reviews</h4>
-                    <el-form-item label="Facebook" :label-width="formLabelInlineW">
-                        <el-input-number class="w-100" v-model="gx_lists[editItem].fb_score" placeholder="FB Score"></el-input-number>
-                    </el-form-item> 
-                    <el-form-item label="Wongnai" :label-width="formLabelInlineW">
-                        <el-input-number v-model="gx_lists[editItem].wn_score" placeholder="WN Score" class="w-100 max-100"> </el-input-number>
-                    </el-form-item>
-                    <el-form-item label="Google" :label-width="formLabelInlineW">
-                        <el-input-number v-model="gx_lists[editItem].google_score" placeholder="Google Score" class="w-100 max-100"> </el-input-number>
-                    </el-form-item>
+                    <el-row v-for="social in gx_lists[editItem].socials" :key="social.value" type="flex" :gutter="10" justify="center">
+                        <el-col>
+                            <el-form-item>
+                                <el-select class="w-100" v-model="social.label" placeholder="Select">
+                                    <el-option
+                                        v-for="item in socialOptions"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                        </el-col>
+                        <el-col>
+                            <el-form-item>
+                                <el-input-number class="w-100" v-model="social.value" placeholder="FB Score"></el-input-number>
+                            </el-form-item>
+                        </el-col> 
+                    </el-row>
+                    <el-row type="flex" justify="end" class="mb-1">
+                        <el-button type="primary" icon="el-icon-plus" circle @click.native.prevent="addNewSocial()" >
+                    </el-button>
+                </el-row>
                 </el-col>
             </el-row>
 
@@ -235,6 +249,22 @@ export default {
         return {
             activePersonalInformation: [],
             loading: false,
+            socialOptions:[
+                {value:'facebook', label: 'Facebook'},
+                {value:'twitter', label: 'Twitter'},
+                {value:'instagram', label: 'Instagram'}, 
+                {value: 'linkedin', label: 'LinkedIn'}, 
+                {value: 'telegram', label: 'Telegram'}, 
+                {value: 'google', label: 'Google'}, 
+                {value: 'whatsapp', label: 'WhatsApp'},
+                {value: 'tik-tok', label: 'TikTok'},
+                {value: 'tripadvisor', label: 'TripAdvisor'}, 
+                {value: 'foodpanda', label: 'Foodpanda'},
+                {value: 'lineman', label: 'Lineman'}, 
+                {value: 'robinhood', label: 'Robinhood'},
+                {value: 'grabfood', label: 'Grabfood'},
+                {value: 'shopee-food', label: 'Shopee food'}
+            ],
             formLabelWidth: '140px',
             formLabelInlineW: '100px',
             fetchWP: new FetchWP({
@@ -279,8 +309,10 @@ export default {
             this.wp_users = response.wp_users 
             response.gx_lists.map((v, k) => {
                 response.gx_lists[k].items = JSON.parse(v.items)
+                response.gx_lists[k].socials = JSON.parse(v.socials)
             })
             if(response.gx_lists.length) this.gx_lists = response.gx_lists 
+            
         })
         .catch(error => {
             console.log('error is: ', error)
@@ -288,9 +320,16 @@ export default {
        
     },
     methods: {
+        addNewSocial(){
+            console.log('social lists: ', this.gx_lists[this.editItem].socials)
+            let self = this
+            this.gx_lists[this.editItem].socials = [...self.gx_lists[this.editItem].socials, {value:'', label: ''}]
+            // this.gx_lists[this.editItem].socials = [...this.gx_lists[this.editItem].socials, ...[{value:'', label: ''}]]
+        },
         getOnlyUserDetails(v){
             this.fetchWP.post(`get_user_details`, {id: v})
-            .then( (response) => { 
+            .then( (response) => {
+                console.log('socials: ', response.socials)
                 this.gx_lists[this.editItem].name           = response.users.name
                 this.gx_lists[this.editItem].location       = response.users.location
                 this.gx_lists[this.editItem].gx_id          = response.users.gx_id
@@ -300,6 +339,8 @@ export default {
                 this.gx_lists[this.editItem].logourl        = response.users.logourl
                 this.gx_lists[this.editItem].sector_number  = response.users.sector_number
                 this.gx_lists[this.editItem].touch_points   = response.users.touch_points
+                this.gx_lists[this.editItem].items          = response.items ? response.items : []
+                // this.gx_lists[this.editItem].socials        = response.socials ? response.socials : []
             })
         },
         onOpenNewEntry() {
@@ -315,6 +356,7 @@ export default {
                 logoid: '',
                 user_id: '',
                 items: [],
+                socials:[],
                 excel: ''    
             }
           this.modalStatus = this.modalStatus ? false : true

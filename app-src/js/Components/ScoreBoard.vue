@@ -1,23 +1,48 @@
 <template>
     <div>
         <el-container v-if="usear_login">
-            <el-header>
-                <el-row>
-                    <h3><strong>Guest Experience Score(GXS):</strong></h3>
+            <el-header class="mt-3">
+                <el-row type="flex" justify="center">
+                    <div class="p-img">
+                        <el-image v-if="client_inf[0]" class="mw-100"
+                        :src="client_inf[0].logourl"
+                        fit="fill"></el-image>
+                        </div>
                 </el-row>
             </el-header>
-            <el-main class="mt-3">
+            <el-main class="mt-1">
                 <el-row class="mb-3" :gutter="20" >
-                    <el-col :xs="24" :sm="24" :md="13" :span="13">
+                    <el-col :span="12" :xs="24" :sm="24" :md="24" :lg="12" :xl="12">
+                                <h3 class="mt-3 card-title">Information:</h3>
+                                <el-card class="border-0 pt-0 br-10px p-30px">
+                                    <ul class="m-0 p-0 lists-style-none information-list">
+                                        <li><strong>Client: </strong>{{ client_inf[0] ? client_inf[0].name : '' }}</li>
+                                        <li><strong>Location: </strong>{{ client_inf[0] ? client_inf[0].location : '' }}</li>
+                                        <li><strong>ID: </strong>{{ client_inf[0] ? client_inf[0].gx_id : '' }}</li>
+                                        <li><strong>Type: </strong>{{ client_inf[0] ? client_inf[0].type : '' }}</li>
+                                        <li><strong>Amount of Onsite Staff: </strong>{{ client_inf[0] ? client_inf[0].staff : '' }}</li>
+                                        <li><strong>Total Number of Touch Points: </strong>{{ client_inf[0] ? client_inf[0].touch_points : '' }}</li>
+                                        <li><strong>Total Number of Sectors: </strong>{{ client_inf[0] ? client_inf[0].sector_number : '' }}</li>
+                                    </ul>
+                                </el-card>
+                         
+                    </el-col>
+                    <el-col :xs="24" :sm="24" :md="24" :lg="12" :span="12" :xl="12">
+                        <h3 class="mt-3 card-title">Guest Experience Score(GXS):</h3>
+                       <el-card class="br-10px p-30px border-0">
                         <el-row :gutter="20">
                             <el-col :xs="24" :span="12" class="mt-xs-1">
                                 <div class="grid-content">
-                                    <el-card shadow="never" class="border-0 bg-blue color-white score-card">
-                                        <h4 class="mb-1 mt-0 text-white"><strong>Audit #:</strong> {{ client_inf[0] ? client_inf[0].id : 0 }}</h4>
-                                        <h3 class="mt-0 mb-0 score text-white"><strong>{{ average1 }}</strong></h3>
-                                        <h5 v-if="different.serial == 1" class="mt-1 mb-0 color-green"><i class="el-icon-caret-top"></i> +{{ different.diff }}</h5>
+                                    <el-card shadow="never" class="border-0 color-white score-card p-30px">
+                                        <el-row type="flex" justify="space-between" class="score-head">
+                                            <span class="mt-0 color3"><strong>Audit#</strong> {{ client_inf[0] ? client_inf[0].id : 0 }}</span>
+                                            <span v-if="different.serial == 1" class="color-green"><i class="el-icon-caret-top"></i> +{{ different.diff }}</span>
+                                        </el-row>
+                                        
+                                        <h3 class="mt-0 mb-0 score color1"><strong>{{ average1 }}</strong></h3>
+                                        
                                     </el-card>
-                                    <el-select @change="dateChangeEvent($event)" class="w-100 mt-1" v-model="start_date" placeholder="Select a Date">
+                                    <el-select @change="dateChangeEvent($event)" class="w-100 mt-1 audit1 audit border-0" v-model="start_date" placeholder="Select a Date">
                                         <el-option
                                             v-for="date in available_dates"
                                             :key="date.value"
@@ -28,12 +53,14 @@
                                 </div>
                             </el-col>
                             <el-col :xs="24" :span="12" class="mt-xs-2">
-                                <el-card shadow="never" class="border-0 bg-yellow color-white score-card">
-                                    <h4 class="mb-1 mt-0 text-white">  <strong >Audit #:</strong> {{ client_inf[1] ? client_inf[1].id : 0 }}</h4>
-                                    <h3 class="mt-0 mb-0 score text-white"><strong>{{ average2 }}</strong></h3>
-                                    <h5 v-if="different.serial==2" class="mt-1 mb-0 color-green"><i class="el-icon-caret-top"></i> +{{ different.diff }}</h5>
+                                <el-card shadow="never" class="border-0 color-white score-card p-30px">
+                                    <el-row type="flex" justify="space-between" class="score-head">
+                                        <span class="mt-0 color3"><strong>Audit#</strong> {{ client_inf[1] ? client_inf[1].id : 0 }}</span>
+                                        <span v-if="different.serial == 2" class="color-green"><i class="el-icon-caret-top"></i> +{{ different.diff }}</span>
+                                    </el-row>
+                                    <h3 class="mt-0 mb-0 score color2"><strong>{{ average2 }}</strong></h3>
                                 </el-card>
-                                <el-select @change="dateChangeEvent($event)" class="w-100 mt-1" v-model="end_date" placeholder="Select a Date">
+                                <el-select @change="dateChangeEvent($event)" class="w-100 mt-1 audit2 audit" v-model="end_date" placeholder="Select a Date">
                                     <el-option
                                         v-for="date in available_dates"
                                         :key="date.value"
@@ -41,110 +68,76 @@
                                         :value="date.value">
                                     </el-option>
                                 </el-select>
-                                   
                             </el-col>
                         </el-row>
-                    </el-col>
-                    <el-col :span="11" :xs="24" :sm="24" :md="11">
-                        <el-row type="flex" class="item-center">
-                            <el-col :span="15" :xs="24">
-                                <el-card shadow="naver" class="border-0 pt-0">
-                                    <h4 class="mt-0 mb-1">Information:</h4>
-                                    <ul class="m-0 p-0 lists-style-none">
-                                        <li>Client: <strong>{{ client_inf[0] ? client_inf[0].name : '' }}</strong></li>
-                                        <li>Location: <strong>{{ client_inf[0] ? client_inf[0].location : '' }}</strong></li>
-                                        <li>ID: <strong>{{ client_inf[0] ? client_inf[0].gx_id : '' }}</strong></li>
-                                        <li>Type: <strong>{{ client_inf[0] ? client_inf[0].type : '' }}</strong></li>
-                                        <li>Amount of Onsite Staff: <strong>{{ client_inf[0] ? client_inf[0].staff : '' }}</strong></li>
-                                        <li>Total Number of Touch Points: <strong>{{ client_inf[0] ? client_inf[0].touch_points : '' }}</strong></li>
-                                        <li>Total Number of Sectors: <strong>{{ client_inf[0] ? client_inf[0].sector_number : '' }}</strong></li>
-                                    </ul>
-                                </el-card>
-                            </el-col>
-                            <el-col :span="9" :xs="24">
-                                <div class="p-img">
-                                    <el-image v-if="client_inf[0]" class="mw-100"
-                                    :src="client_inf[0].logourl"
-                                    fit="fill"></el-image>
-                                </div>
-                            </el-col>
-                        </el-row>
+                       </el-card>
                     </el-col>
                 </el-row>
-                <el-row :gutter="0" class="mt-3">
-                    <el-col :span="16" :xs="24">
+                <el-row class="mt-3">
                         <div class="chartWrap">
-                            <h4 class="mb-1"><strong>Guest Journey:</strong></h4>
-                            <div id="chart">
-                                <apexchart type="bar" height="350" :options="chartOptions" :series="series"></apexchart>
-                            </div>
+                            <h3 class="mb-1 card-title"><strong>Guest Journey:</strong></h3>
+                            <el-card class="br-10px p-30px border-0">
+                                <div id="chart">
+                                    <apexchart type="bar" height="350" :options="chartOptions" :series="series"></apexchart>
+                                </div>
+                            </el-card>
                         </div>
-                    </el-col>
-                    <el-col :span="8" :xs="24">
-                        <h4 class="mb-1"><strong>Review Platforms:</strong></h4>
-                        <div class="socialWrap">
-                            <el-row type="flex" justify="center" class="item-center mb-1" :gutter="20">
-                                <el-col :span="8"><div v-bind:style="{ 'background-image': 'url(' + $publicAssets('images/fb.jpg') + ')' }" class="bg-social-img"></div></el-col>
-                                <el-col :span="8">
-                                    <el-card shadow="never" class="border-0 bg-blue color-white">
-                                        <h4 class="mt-0 mb-0 score"><strong>{{ client_inf[0] ? client_inf[0].fb_score : 0 }}</strong></h4>
-                                    </el-card>
-                                </el-col>
-                                <el-col :span="8">
-                                    <el-card shadow="never" class="border-0 bg-yellow color-white">
-                                        <h4 class="mt-0 mb-0 score"><strong>{{ client_inf[1] ? client_inf[1].fb_score : 0 }}</strong></h4>
-                                    </el-card>
-                                </el-col>
-                            </el-row>
-                            <el-row type="flex" justify="center" class="item-center mb-1" :gutter="20">
-                                <el-col :span="8"><div v-bind:style="{ 'background-image': 'url(' + $publicAssets('images/w.jpg') + ')' }" class="bg-social-img"></div></el-col>
-                                <el-col :span="8">
-                                    <el-card shadow="never" class="border-0 bg-blue color-white">
-                                        <h4 class="mt-0 mb-0 score"><strong>{{ client_inf[0] ? client_inf[0].wn_score : 0 }}</strong></h4>
-                                    </el-card>
-                                </el-col>
-                                <el-col :span="8">
-                                    <el-card shadow="never" class="border-0 bg-yellow color-white">
-                                        <h4 class="mt-0 mb-0 score"><strong>{{ client_inf[1] ? client_inf[1].wn_score : 0 }}</strong></h4>
-                                    </el-card>
-                                </el-col>
-                            </el-row>
-                            <el-row type="flex" justify="center" class="item-center" :gutter="20">
-                                <el-col :span="8"><div v-bind:style="{ 'background-image': 'url(' + $publicAssets('images/g.jpg') + ')' }" class="bg-social-img"></div></el-col>
-                                <el-col :span="8">
-                                    <el-card shadow="never" class="border-0 bg-blue color-white">
-                                        <h4 class="mt-0 mb-0 score"><strong>{{ client_inf[0] ? client_inf[0].google_score : 0 }}</strong></h4>
-                                    </el-card>
-                                </el-col>
-                                <el-col :span="8">
-                                    <el-card shadow="never" class="border-0 bg-yellow color-white">
-                                        <h4 class="mt-0 mb-0 score"><strong>{{ client_inf[1] ? client_inf[1].google_score : 0 }}</strong></h4>
-                                    </el-card>
-                                </el-col>
-                            </el-row>
-                        </div>
-                    </el-col>
+                    
                 </el-row>
-                <el-row>
-                    <el-col :span="24" :xs="24">
-                        <h5 class="mb-1"><strong>Reports:</strong></h5>
-                        <el-card shadow="never" class="bg-blue border-rounded text-white text-uppercase">
-                            <el-row>
-                                <el-col :span="9" :xs="24">
+                <el-row class="mt-3">
+                        <h4 class="mb-1 card-title"><strong>Social Reviews:</strong></h4>
+                        <el-card class="br-10px plr-30px ptb-20px border-0">
+                        <div class="socialWrap">
+                            
+                            <el-row class="item-center mb-1 g-3" :gutter="15">
+                                <!-- <el-col :span="6"><div v-bind:style="{ 'background-image': 'url(' + $publicAssets('images/fb.jpg') + ')' }" class="bg-social-img"></div></el-col> -->
+                                <el-col v-for="(n, index) in socials" :key="index" :xs="12" :sm="12" :md="6" :span="6">
+                                    <el-card shadow="never" class="border-0 br-10px p-15px social-card mt-1">
+                                        <el-row type="flex" justify="center" class="item-center">
+                                            <el-col :span="12">
+                                                <el-image v-if="client_inf[0]" class="mw-100 justify-center d-flex"
+                                                :src="$publicAssets(`images/${index}.png`)"
+                                                fit="fill"></el-image>
+                                            </el-col>
+                                            <el-col :span="12">
+                                                <div class="socialscore">
+                                                    <span>{{ n[0] }}</span>
+                                                    <span>{{ n[1] }}</span>
+                                                </div>
+                                            </el-col>
+                                        </el-row>
+                                        <!-- <h4 class="mt-0 mb-0 score"><strong>{{ client_inf[0] ? client_inf[0].fb_score : 0 }}</strong></h4> -->
+                                    </el-card>
+                                </el-col>
+                            </el-row>
+                            
+                           
+                        </div>
+                    </el-card>
+                </el-row>
+                <el-row class="mt-3">
+                        <h5 class="mb-1 card-title"><strong>Reports:</strong></h5>
+                        <el-card class="br-10px border-0 reports">
+                            <el-row class="item-center">
+                                <el-col :span="10" :xs="24" class="p-10px">
                                     <strong>DATE:</strong> {{ start_date | moment("Do MMMM, YYYY") }}
                                 </el-col>
-                                <el-col :span="7" :xs="10">
-                                    <strong v-if="client_inf[0]">Audit #:</strong> {{ client_inf[0] ? client_inf[0].id : '' }}
-                                </el-col>
-                                <el-col :span="7" :xs="10">
+                                <el-col :span="8" :xs="12" class="p-10px">
                                     <strong v-if="client_inf[0]">ID #:</strong> {{ client_inf[0] ? client_inf[0].gx_id : '' }}
                                 </el-col>
-                                <el-col :span="1" :xs="4">
-                                    <el-button v-if="client_inf.length > 0" class="download-btn color-white border-white" @click="downloadExcel()" icon="el-icon-download" circle></el-button>
+                                <el-col :span="6" :xs="12">
+                                    <el-row type="flex" justify="end">
+                                        <el-button v-if="client_inf.length > 0" class="d-flex item-center download-btn" @click="downloadExcel()">
+                                        <span>Download Reports &nbsp;</span>
+                                        <el-image v-if="client_inf[0]" class="justify-center"
+                                                :src="$publicAssets(`images/download-icon.png`)"
+                                                fit="fill">
+                                        </el-image>
+                                    </el-button>
+                                    </el-row>
                                 </el-col>
                             </el-row>
                         </el-card>
-                    </el-col>
                 </el-row>
             </el-main>
       </el-container>
@@ -174,6 +167,7 @@ export default {
             average1: 0, 
             average2: 0,
             gx_display_message: '',
+            socials: {},
             available_dates: [],
             usear_login: window.gx_object.user_id > 0 ? true : false,
             different: {serial:0},
@@ -190,55 +184,89 @@ export default {
                         show: false
                     },
                     type: 'bar',
-                    height: 350
+                    height: 450
                 },
                 legend: {
-                        show: false
+                    show: false
                 },
                 plotOptions: {
                     bar: {
                         horizontal: false,
-                        columnWidth: '80%',
+                        borderRadius: 5,
                         endingShape: 'rounded',
-                        borderRadius: 0,
+                        columnWidth: '70%',
+                        borderRadiusApplication: 'end',
+                        rangeBarOverlap: true,
                         dataLabels: {
                           position: 'top', // top, center, bottom
+                          maxItems: 100,
                         },
                     },
                 },
+                
                 dataLabels: {
                     enabled: true, 
                     formatter: function (val) {
                         return val + "%";
                     },
-                    offsetY: -23,
+                    offsetX: 0,
+                    offsetY: -20,
                     style: {
-                        fontSize: '10px',
-                        colors: ["#999"]
+                        fontSize: '12px',
+                        colors: ['#18186E']
                     }
                 },
                 stroke: {
                     show: true,
                     width: 2,
-                    colors: ['transparent']
+                    colors: ['#fff']
                 },
                 xaxis: {
                     categories: [],
                 },
                 yaxis: {
-                title: false
+                    tickAmount: 4,
+                    min: 0,
+                    max: 100,
+                    labels: {
+                        minWidth: 0,
+                        maxWidth: 100,
+                    }
                 },
                 fill: {
                     opacity: 1, 
-                    colors: ['#529CFD', '#FFC207']
+                    colors: ['#529CFD', '#18186E']
                 },
                 tooltip: {
+                enabled: false,
+                shared: false,
+                intersect: false,
                 y: {
                     formatter: function (val) {
-                    return "$ " + val + " thousands"
+                            return val
+                        }
+                    }
+                },
+                responsive: [
+                {
+                    breakpoint: 767,
+                    options: {
+                        plotOptions: {
+                            bar: {
+                                columnWidth: '70%'
+                            }
+                        },
+                        dataLabels: {
+                            formatter: function (val) {
+                                return val;
+                            },
+                            style: {
+                                fontSize: '10px',
+                            }
+                        },
                     }
                 }
-                }
+            ]
             },
 
           
@@ -275,6 +303,9 @@ export default {
             })
         }
     }, 
+    computed: {
+       
+    },
     methods: {
         dateChangeEvent(){
             let data = {
@@ -287,6 +318,7 @@ export default {
         getData(data){
             this.fetchWP.post(`frontend_config`, data)
         .then((response) => { 
+            this.socials = response.socials
             this.available_dates = response.available_dates.length ? response.available_dates : []
             if(response.results.length > 0 && response.results[0].date){
                 this.start_date = response.results[0].date
@@ -297,8 +329,10 @@ export default {
             let temCat = [], 
             temScore1 = [], 
             temScore2 = [];
+            
             response.results.map((v, k) => {
                 response.results[k].items = JSON.parse(v.items)
+
                 response.results[k].items.map((i, m) => {
                     temCat = [...temCat, ...[i.name]]
                     if(k==0){
