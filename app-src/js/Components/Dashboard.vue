@@ -7,17 +7,18 @@
                 <el-col :span="12">
                     <h4 class="mt-0">GXS Information</h4>
                     <el-form-item label="User" :label-width="formLabelInlineW">
-                        <el-select  @change="getOnlyUserDetails($event)" class="w-100" v-model="gx_lists[editItem].user_id" placeholder="Select">
+                        <el-select @change="getOnlyUserDetails($event)" class="w-100" v-model="gx_lists[editItem].user_id" placeholder="Select">
                             <el-option
                                 v-for="item in wp_users"
                                 :key="item.id"
                                 :label="item.name"
-                                :value="item.id">
+                                :value="item.id.toString()">
                             </el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item label="Date" :label-width="formLabelInlineW">
                         <el-date-picker
+                            :localTime="false"
                             v-model="gx_lists[editItem].date"
                             type="date"
                             placeholder="Pick a day"
@@ -214,7 +215,7 @@
                         <el-table-column
                             label="Date">
                             <template slot-scope="scope">
-                                <span>{{ scope.row.date | moment("Do MMMM, YYYY") }}</span>
+                                <span v-if="scope.row.date != '0000-00-00 00:00:00'">{{ scope.row.date | moment("Do MMMM, YYYY") }}</span>
                             </template>
                         </el-table-column>
                         <el-table-column
@@ -306,11 +307,13 @@ export default {
     mounted(){
         this.fetchWP.get(`config`)
         .then((response) => { 
-            this.wp_users = response.wp_users 
+            this.wp_users = response.wp_users
+            
             response.gx_lists.map((v, k) => {
                 response.gx_lists[k].items = JSON.parse(v.items)
                 response.gx_lists[k].socials = JSON.parse(v.socials)
             })
+            
             if(response.gx_lists.length) this.gx_lists = response.gx_lists 
             
         })
@@ -321,7 +324,6 @@ export default {
     },
     methods: {
         addNewSocial(){
-            console.log('social lists: ', this.gx_lists[this.editItem].socials)
             let self = this
             this.gx_lists[this.editItem].socials = [...self.gx_lists[this.editItem].socials, {value:'', label: ''}]
             // this.gx_lists[this.editItem].socials = [...this.gx_lists[this.editItem].socials, ...[{value:'', label: ''}]]
@@ -329,7 +331,6 @@ export default {
         getOnlyUserDetails(v){
             this.fetchWP.post(`get_user_details`, {id: v})
             .then( (response) => {
-                console.log('socials: ', response.socials)
                 this.gx_lists[this.editItem].name           = response.users.name
                 this.gx_lists[this.editItem].location       = response.users.location
                 this.gx_lists[this.editItem].gx_id          = response.users.gx_id

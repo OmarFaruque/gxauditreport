@@ -57,6 +57,7 @@ import {
     Image
 } from 'element-ui';
 
+
 Vue.use(Card);
 Vue.use(Button);
 Vue.use(Image);

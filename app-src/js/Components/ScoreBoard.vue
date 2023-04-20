@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-container v-if="usear_login">
+        <el-container v-loading="loading" v-if="usear_login && gx_display_message == ''">
             <el-header class="mt-3">
                 <el-row type="flex" justify="center">
                     <div class="p-img">
@@ -35,11 +35,13 @@
                                 <div class="grid-content">
                                     <el-card shadow="never" class="border-0 color-white score-card p-30px">
                                         <el-row type="flex" justify="space-between" class="score-head">
-                                            <span class="mt-0 color3"><strong>Audit#</strong> {{ client_inf[0] ? client_inf[0].id : 0 }}</span>
+                                            
+                                            <span v-if="client_inf[0].date" class="mt-0 color3"><strong>{{ client_inf[0].date | moment("DD/MM/YYYY") }}</strong></span>
+                                            <span v-else class="mt-0 color3" style="color:transparent;"><strong>00/00/0000</strong></span>
                                             <span v-if="different.serial == 1" class="color-green"><i class="el-icon-caret-top"></i> +{{ different.diff }}</span>
                                         </el-row>
                                         
-                                        <h3 class="mt-0 mb-0 score color1"><strong>{{ average1 }}</strong></h3>
+                                        <h3 class="mt-0 mb-0 score color1">{{ average1 }}</h3>
                                         
                                     </el-card>
                                     <el-select @change="dateChangeEvent($event)" class="w-100 mt-1 audit1 audit border-0" v-model="start_date" placeholder="Select a Date">
@@ -55,10 +57,11 @@
                             <el-col :xs="24" :span="12" class="mt-xs-2">
                                 <el-card shadow="never" class="border-0 color-white score-card p-30px">
                                     <el-row type="flex" justify="space-between" class="score-head">
-                                        <span class="mt-0 color3"><strong>Audit#</strong> {{ client_inf[1] ? client_inf[1].id : 0 }}</span>
-                                        <span v-if="different.serial == 2" class="color-green"><i class="el-icon-caret-top"></i> +{{ different.diff }}</span>
+                                        <span v-if="client_inf[1].date" class="mt-0 color3"><strong>{{  client_inf[1].date | moment("DD/MM/YYYY") }}</strong></span>
+                                        <span v-else class="mt-0 color3" style="color:transparent;"><strong>00/00/0000</strong></span>
+                                        <span v-if="different.serial == 2" class="color-green"> +{{ different.diff }}</span>
                                     </el-row>
-                                    <h3 class="mt-0 mb-0 score color2"><strong>{{ average2 }}</strong></h3>
+                                    <h3 class="mt-0 mb-0 score color2">{{ average2 }}</h3>
                                 </el-card>
                                 <el-select @change="dateChangeEvent($event)" class="w-100 mt-1 audit2 audit" v-model="end_date" placeholder="Select a Date">
                                     <el-option
@@ -77,20 +80,21 @@
                         <div class="chartWrap">
                             <h3 class="mb-1 card-title"><strong>Guest Journey:</strong></h3>
                             <el-card class="br-10px p-30px border-0">
+                                
                                 <div id="chart">
-                                    <apexchart type="bar" height="350" :options="chartOptions" :series="series"></apexchart>
+                                    <apexchart v-if="chartOptions.xaxis.categories.length" type="bar" height="350" :options="chartOptions" :series="series"></apexchart>
+                                    <h5 class="text-center" v-else>No data are available for display</h5>
                                 </div>
                             </el-card>
                         </div>
                     
                 </el-row>
-                <el-row class="mt-3">
+                <el-row  class="mt-3">
                         <h4 class="mb-1 card-title"><strong>Social Reviews:</strong></h4>
                         <el-card class="br-10px plr-30px ptb-20px border-0">
                         <div class="socialWrap">
                             
-                            <el-row class="item-center mb-1 g-3" :gutter="15">
-                                <!-- <el-col :span="6"><div v-bind:style="{ 'background-image': 'url(' + $publicAssets('images/fb.jpg') + ')' }" class="bg-social-img"></div></el-col> -->
+                            <el-row v-if="socials.length" class="item-center mb-1 g-3" :gutter="15">
                                 <el-col v-for="(n, index) in socials" :key="index" :xs="12" :sm="12" :md="6" :span="6">
                                     <el-card shadow="never" class="border-0 br-10px p-15px social-card mt-1">
                                         <el-row type="flex" justify="center" class="item-center">
@@ -110,6 +114,9 @@
                                     </el-card>
                                 </el-col>
                             </el-row>
+                            <el-row v-else>
+                                <h5 class="text-center">No data are available for display</h5>
+                            </el-row>
                             
                            
                         </div>
@@ -127,7 +134,7 @@
                                 </el-col>
                                 <el-col :span="6" :xs="12">
                                     <el-row type="flex" justify="end">
-                                        <el-button v-if="client_inf.length > 0" class="d-flex item-center download-btn" @click="downloadExcel()">
+                                        <el-button v-if="client_inf.length && client_inf[0].excel" class="d-flex item-center download-btn" @click="downloadExcel()">
                                         <span>Download Reports &nbsp;</span>
                                         <el-image v-if="client_inf[0]" class="justify-center"
                                                 :src="$publicAssets(`images/download-icon.png`)"
@@ -164,6 +171,7 @@ export default {
     },
     data() {
         return {
+            loading: true,
             average1: 0, 
             average2: 0,
             gx_display_message: '',
@@ -281,7 +289,7 @@ export default {
                 logourl: '',
                 logoid: '',
                 user_id: '',
-                date: new Date(),
+                date: '',
                 items: []    
             },{}], 
             start_date: '',
@@ -318,50 +326,143 @@ export default {
         getData(data){
             this.fetchWP.post(`frontend_config`, data)
         .then((response) => { 
+            this.loading = false;
             this.socials = response.socials
             this.available_dates = response.available_dates.length ? response.available_dates : []
-            if(response.results.length > 0 && response.results[0].date){
-                this.start_date = response.results[0].date
-            }
-            if(response.results.length > 1 && response.results[1].date){
-                this.end_date = response.results[1].date
-            }
-            let temCat = [], 
-            temScore1 = [], 
-            temScore2 = [];
-            
-            response.results.map((v, k) => {
-                response.results[k].items = JSON.parse(v.items)
 
-                response.results[k].items.map((i, m) => {
-                    temCat = [...temCat, ...[i.name]]
-                    if(k==0){
-                        temScore1 = [...temScore1, ...[i.score]]
-                    }else{
-                        temScore2 = [...temScore2, ...[i.score]]
-                    }
-                })  
-            })
-
-            this.average1 = temScore1.length ? (temScore1.reduce((a, b) => a + b) / temScore1.length).toFixed(1) : 0;
-            this.average2 = temScore2.length > 0 ? (temScore2.reduce((a, b) => a + b) / temScore2.length).toFixed(1) : 0;
-            if(+this.average1 > +this.average2){
-                this.different = {serial: 1, diff: (this.average1 - this.average2).toFixed(2)}
-            }else{
-                this.different = {serial: 2, diff: (this.average2 - this.average1).toFixed(2)}
-            }
-            
-
-            this.client_inf = response.results 
-            
-            let tempSeries = [{name: 'Item 1', data: temScore1},{name: 'Item 2', data: temScore2}];
-            
-            this.series = tempSeries;
-            this.chartOptions = {
-                xaxis: {
-                    categories: temCat
+                // Show error if data less then 2
+                if(response.results.length < 2){
+                    this.gx_display_message = 'No data are available for display';
                 }
-            } 
+
+                if(response.results.length > 0 && response.results[0].date){
+                    this.start_date = response.results[0].date
+                }
+                if(response.results.length > 1 && response.results[1].date){
+                    this.end_date = response.results[1].date
+                }
+                
+                let temCat = [], 
+                temScore1 = [], 
+                temScore2 = [];
+                
+                response.results.map((v, k) => {
+                    response.results[k].items = JSON.parse(v.items)
+
+                    response.results[k].items.map((i, m) => {
+                        temCat = [...temCat, ...[i.name]]
+                        if(k==0){
+                            temScore1 = [...temScore1, ...[i.score]]
+                        }else{
+                            temScore2 = [...temScore2, ...[i.score]]
+                        }
+                    })  
+                })
+
+                
+                this.average1 = temScore1.length ? (temScore1.reduce((a, b) => a + b) / temScore1.length).toFixed(1) : 0;
+                this.average2 = temScore2.length > 0 ? (temScore2.reduce((a, b) => a + b) / temScore2.length).toFixed(1) : 0;
+                if(+this.average1 > +this.average2){
+                    this.different = {serial: 1, diff: (this.average1 - this.average2).toFixed(2)}
+                }else{
+                    this.different = {serial: 2, diff: (this.average2 - this.average1).toFixed(2)}
+                }
+
+                this.client_inf = response.results 
+                
+                let tempSeries = [{name: 'Item 1', data: temScore1},{name: 'Item 2', data: temScore2}];
+                
+                this.series = tempSeries;
+                this.chartOptions = {
+                chart: {
+                    toolbar: {
+                        show: false
+                    },
+                    type: 'bar',
+                    height: 450
+                },
+                legend: {
+                    show: false
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: false,
+                        borderRadius: 5,
+                        endingShape: 'rounded',
+                        columnWidth: '70%',
+                        borderRadiusApplication: 'end',
+                        rangeBarOverlap: true,
+                        dataLabels: {
+                          position: 'top', // top, center, bottom
+                          maxItems: 100,
+                        },
+                    },
+                },
+                
+                dataLabels: {
+                    enabled: true, 
+                    formatter: function (val) {
+                        return val + "%";
+                    },
+                    offsetX: 0,
+                    offsetY: -20,
+                    style: {
+                        fontSize: '12px',
+                        colors: ['#18186E']
+                    }
+                },
+                stroke: {
+                    show: true,
+                    width: 2,
+                    colors: ['#fff']
+                },
+                xaxis: {
+                    categories: temCat,
+                },
+                yaxis: {
+                    tickAmount: 4,
+                    min: 0,
+                    max: 100,
+                    labels: {
+                        minWidth: 0,
+                        maxWidth: 100,
+                    }
+                },
+                fill: {
+                    opacity: 1, 
+                    colors: ['#529CFD', '#18186E']
+                },
+                tooltip: {
+                enabled: false,
+                shared: false,
+                intersect: false,
+                y: {
+                    formatter: function (val) {
+                            return val
+                        }
+                    }
+                },
+                responsive: [
+                {
+                    breakpoint: 767,
+                    options: {
+                        plotOptions: {
+                            bar: {
+                                columnWidth: '70%'
+                            }
+                        },
+                        dataLabels: {
+                            formatter: function (val) {
+                                return val;
+                            },
+                            style: {
+                                fontSize: '10px',
+                            }
+                        },
+                    }
+                }
+            ]
+            }
         })
         },
         downloadExcel(){

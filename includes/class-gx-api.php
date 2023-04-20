@@ -199,9 +199,8 @@ class GX_Api
         $table = $this->wpdb->prefix . 'gx_audit';
         $start_date = $data['start_date'];
         $end_date = $data['end_date'];
-        date_default_timezone_set("Asia/Dhaka");
 
-        $qry = $this->wpdb->prepare("SELECT * FROM {$table} WHERE `user_id`=%d", $data['id']);
+        $qry = $this->wpdb->prepare("SELECT * FROM {$table} WHERE `user_id`=%d AND `date` != %s", $data['id'], '0000-00-00 00:00:00');
 
         $availableDates = $this->wpdb->get_results($qry, OBJECT);
         $availableDates = array_map(function($v){

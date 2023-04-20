@@ -82,7 +82,7 @@ div#gx_scoreboard_app{max-width: unset;}
 .card-title{
     margin-bottom: 18px;
     text-transform: capitalize;
-    font-size: 22px;
+    font-size: 22px !important;
     color: #18186e;
 }
 .br-5px{border-radius: 5px;}
@@ -189,7 +189,6 @@ button[type=button],
         span{
             &:first-child{
                 font-size: 18px;
-                font-weight: 600;
             }
             &:last-child{
                 font-size: 18px;
