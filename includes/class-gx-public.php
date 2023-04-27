@@ -131,7 +131,7 @@ class GX_Public
     public function gx_score_board_callback(){
         return (
             '<div id="' . $this->token . '_ui_public" class="bg-white border-round-5 pb-5">
-                <div class="' . $this->token . '_loader"><p>' . __('Loading User Interface...', 'gx-audit') . '</p></div>
+                <div class="' . $this->token . '_loader"><p>' . __('Loading...', 'gx-audit') . '</p></div>
             </div>'
         );
        

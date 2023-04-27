@@ -27,10 +27,13 @@
                         </el-date-picker>
                     </el-form-item>
                     <el-form-item label="Excel" :label-width="formLabelInlineW">
-                        <el-button @click="excelFileUpload()" class="upload-demo mw-100 excel-upload">
-                            <i v-if="gx_lists[editItem].excel" class="el-icon-document-remove"></i>
-                            <i v-else class="el-icon-upload"></i>
-                        </el-button>
+                        <el-row type="flex" class="item-center">
+                            <el-button @click="excelFileUpload()" class="upload-demo excel-upload">
+                                <i v-if="gx_lists[editItem].excel" class="el-icon-document-remove"></i>
+                                <i v-else class="el-icon-upload"></i>
+                            </el-button>
+                            <i v-if="gx_lists[editItem].excel" @click="excelRemove()" class="el-icon-circle-close ml-1 remove-excel"></i>
+                        </el-row>
                     </el-form-item>
                 </el-col>
                 <el-col :span="12">
@@ -377,6 +380,10 @@ export default {
             };
             wp.media.editor.open();
         }, 
+        excelRemove(){
+            var self = this;
+            self.gx_lists[self.editItem].excel = ''
+        },
         wpMediaUpload () {
             var self = this;
             wp.media.editor.send.attachment = function (props, attachment) {

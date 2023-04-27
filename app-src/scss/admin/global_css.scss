@@ -68,12 +68,20 @@
   .mb-1{margin-bottom: 1rem;}
   .mb-2{margin-bottom: 2rem;}
   .mb-3{margin-bottom: 3rem;}
+  .ml-1{margin-left: 1rem;}
   .el-input-number__decrease{left: 2px;}
   .list-logo{max-width: 100%; width: 150px;}
   .item-center{align-items: center;}
 
+  .remove-excel{
+    cursor: pointer;
+    &:hover{
+      color: red;
+    }
+  }
   .excel-upload{
     width: 100%;
+    position: relative;
     padding: 10px;
         i.el-icon-upload{
           font-size: 20px;

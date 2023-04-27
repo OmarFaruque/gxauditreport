@@ -129,19 +129,6 @@ class GX_Api
 
             }
         );
-
-
-        // add_action( 'wp_head', function(){
-
-        //     $table = $this->wpdb->prefix . 'gx_audit';
-        //     $qry = $this->wpdb->prepare("SELECT `items` FROM {$table} WHERE `user_id`=%d ORDER BY `id` ASC LIMIT 1", 1);
-        //     $data = $this->wpdb->get_row($qry, OBJECT);
-
-        //     echo 'data array <pre>';
-        //     print_r($data);
-        //     echo '</pre>';
-        // } );
-
     }
 
 
@@ -202,7 +189,10 @@ class GX_Api
 
         $qry = $this->wpdb->prepare("SELECT * FROM {$table} WHERE `user_id`=%d AND `date` != %s", $data['id'], '0000-00-00 00:00:00');
 
-        $availableDates = $this->wpdb->get_results($qry, OBJECT);
+
+        $avilableQry = $qry . " GROUP BY DATE(`date`)";
+
+        $availableDates = $this->wpdb->get_results($avilableQry, OBJECT);
         $availableDates = array_map(function($v){
             return array(
                 'value' => $v->date, 
@@ -268,10 +258,6 @@ class GX_Api
 
         return new WP_REST_Response(array('msg' => $msg), 200);
     }
-
-
-
-
 
 
     /**

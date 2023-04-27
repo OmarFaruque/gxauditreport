@@ -13,7 +13,7 @@
             <el-main class="mt-1">
                 <el-row class="mb-3" :gutter="20" >
                     <el-col :span="12" :xs="24" :sm="24" :md="24" :lg="12" :xl="12">
-                                <h3 class="mt-3 card-title">Information:</h3>
+                                <h2 class="mt-3 card-title">Information:</h2>
                                 <el-card class="border-0 pt-0 br-10px p-30px">
                                     <ul class="m-0 p-0 lists-style-none information-list">
                                         <li><strong>Client: </strong>{{ client_inf[0] ? client_inf[0].name : '' }}</li>
@@ -28,7 +28,7 @@
                          
                     </el-col>
                     <el-col :xs="24" :sm="24" :md="24" :lg="12" :span="12" :xl="12">
-                        <h3 class="mt-3 card-title">Guest Experience Score(GXS):</h3>
+                        <h2 class="mt-3 card-title">Guest Experience Score(GXS):</h2>
                        <el-card class="br-10px p-30px border-0">
                         <el-row :gutter="20">
                             <el-col :xs="24" :span="12" class="mt-xs-1">
@@ -36,7 +36,7 @@
                                     <el-card shadow="never" class="border-0 color-white score-card p-30px">
                                         <el-row type="flex" justify="space-between" class="score-head">
                                             
-                                            <span v-if="client_inf[0].date" class="mt-0 color3"><strong>{{ client_inf[0].date | moment("DD/MM/YYYY") }}</strong></span>
+                                            <span v-if="client_inf[0] && client_inf[0].date" class="mt-0 color3"><strong>{{ client_inf[0].date | moment("DD/MM/YYYY") }}</strong></span>
                                             <span v-else class="mt-0 color3" style="color:transparent;"><strong>00/00/0000</strong></span>
                                             <span v-if="different.serial == 1" class="color-green"><i class="el-icon-caret-top"></i> +{{ different.diff }}</span>
                                         </el-row>
@@ -57,7 +57,7 @@
                             <el-col :xs="24" :span="12" class="mt-xs-2">
                                 <el-card shadow="never" class="border-0 color-white score-card p-30px">
                                     <el-row type="flex" justify="space-between" class="score-head">
-                                        <span v-if="client_inf[1].date" class="mt-0 color3"><strong>{{  client_inf[1].date | moment("DD/MM/YYYY") }}</strong></span>
+                                        <span v-if="client_inf[1] && client_inf[1].date" class="mt-0 color3"><strong>{{  client_inf[1].date | moment("DD/MM/YYYY") }}</strong></span>
                                         <span v-else class="mt-0 color3" style="color:transparent;"><strong>00/00/0000</strong></span>
                                         <span v-if="different.serial == 2" class="color-green"> +{{ different.diff }}</span>
                                     </el-row>
@@ -78,7 +78,7 @@
                 </el-row>
                 <el-row class="mt-3">
                         <div class="chartWrap">
-                            <h3 class="mb-1 card-title"><strong>Guest Journey:</strong></h3>
+                            <h2 class="mb-1 card-title"><strong>Guest Journey:</strong></h2>
                             <el-card class="br-10px p-30px border-0">
                                 
                                 <div id="chart">
@@ -90,11 +90,10 @@
                     
                 </el-row>
                 <el-row  class="mt-3">
-                        <h4 class="mb-1 card-title"><strong>Social Reviews:</strong></h4>
+                        <h2 class="mb-1 card-title"><strong>Social Reviews:</strong></h2>
                         <el-card class="br-10px plr-30px ptb-20px border-0">
                         <div class="socialWrap">
-                            
-                            <el-row v-if="socials.length" class="item-center mb-1 g-3" :gutter="15">
+                            <el-row v-if="Object.keys(socials).length" class="item-center mb-1 g-3" :gutter="15">
                                 <el-col v-for="(n, index) in socials" :key="index" :xs="12" :sm="12" :md="6" :span="6">
                                     <el-card shadow="never" class="border-0 br-10px p-15px social-card mt-1">
                                         <el-row type="flex" justify="center" class="item-center">
@@ -123,9 +122,9 @@
                     </el-card>
                 </el-row>
                 <el-row class="mt-3">
-                        <h5 class="mb-1 card-title"><strong>Reports:</strong></h5>
+                        <h2 class="mb-1 card-title"><strong>Reports:</strong></h2>
                         <el-card class="br-10px border-0 reports">
-                            <el-row class="item-center">
+                            <el-row type="flex" v-if="client_inf.length && client_inf[0].excel" class="item-center mb-d-block">
                                 <el-col :span="10" :xs="24" class="p-10px">
                                     <strong>DATE:</strong> {{ start_date | moment("Do MMMM, YYYY") }}
                                 </el-col>
@@ -134,7 +133,7 @@
                                 </el-col>
                                 <el-col :span="6" :xs="12">
                                     <el-row type="flex" justify="end">
-                                        <el-button v-if="client_inf.length && client_inf[0].excel" class="d-flex item-center download-btn" @click="downloadExcel()">
+                                        <el-button class="d-flex item-center download-btn" @click="downloadExcel()">
                                         <span>Download Reports &nbsp;</span>
                                         <el-image v-if="client_inf[0]" class="justify-center"
                                                 :src="$publicAssets(`images/download-icon.png`)"
@@ -143,6 +142,9 @@
                                     </el-button>
                                     </el-row>
                                 </el-col>
+                            </el-row>
+                            <el-row v-else>
+                                <h5 class="text-center">No data are available for display</h5>
                             </el-row>
                         </el-card>
                 </el-row>
@@ -330,8 +332,8 @@ export default {
             this.socials = response.socials
             this.available_dates = response.available_dates.length ? response.available_dates : []
 
-                // Show error if data less then 2
-                if(response.results.length < 2){
+                // Show error if data less then 1
+                if(response.results.length <= 0){
                     this.gx_display_message = 'No data are available for display';
                 }
 

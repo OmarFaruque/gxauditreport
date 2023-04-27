@@ -173,7 +173,7 @@ class GX_Backend
     public function gx_admin_page_callback(){
         echo (
             '<div id="' . $this->token . '_ui_root" class="bg-white border-round-5 pb-5">
-                <div class="' . $this->token . '_loader"><p>' . __('Loading User Interface...', 'gx-audit') . '</p></div>
+                <div class="' . $this->token . '_loader"><p>' . __('Loading...', 'gx-audit') . '</p></div>
             </div>'
         );
     }
