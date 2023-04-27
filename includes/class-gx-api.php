@@ -191,7 +191,6 @@ class GX_Api
 
 
         $avilableQry = $qry . " GROUP BY DATE(`date`)";
-
         $availableDates = $this->wpdb->get_results($avilableQry, OBJECT);
         $availableDates = array_map(function($v){
             return array(

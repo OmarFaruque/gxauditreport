@@ -40,6 +40,9 @@ $color3: #18186e;
             input{
                 color: black;
                 background-color: $color2;
+                &::placeholder{
+                    color: black;
+                }
             }
         }
     }
@@ -90,7 +93,7 @@ div#gx_scoreboard_app{max-width: unset;}
 .information-list li {
     font-family: 'Ubuntu', sans-serif;
     font-size: 14px;
-    line-height: 20.5px;
+    line-height: 18px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -180,19 +183,21 @@ button[type=button],
 .score-card {
     background-color: #EDF3FF;
     h3.score{
-        font-size: 85px;
-        line-height: 1.1;
+        font-size: 64px;
+        line-height: 1;
         font-weight: 700;
         text-align: center;
         text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.08);
     }
     .score-head{
         span{
-            &:first-child{
-                font-size: 18px;
+            font-size: 14px;
+            font-weight: 600;
+            &.audit-date{
+                margin-left: -10px
             }
-            &:last-child{
-                font-size: 18px;
+            &.audit-point{
+                margin-left: 20px;
                 font-weight: 500;
             }
         }

@@ -36,9 +36,9 @@
                                     <el-card shadow="never" class="border-0 color-white score-card p-30px">
                                         <el-row type="flex" justify="space-between" class="score-head">
                                             
-                                            <span v-if="client_inf[0] && client_inf[0].date" class="mt-0 color3"><strong>{{ client_inf[0].date | moment("DD/MM/YYYY") }}</strong></span>
-                                            <span v-else class="mt-0 color3" style="color:transparent;"><strong>00/00/0000</strong></span>
-                                            <span v-if="different.serial == 1" class="color-green"><i class="el-icon-caret-top"></i> +{{ different.diff }}</span>
+                                            <span v-if="client_inf[0] && client_inf[0].date" class="mt-0 color3 audit-date"><strong>{{ client_inf[0].date | moment("DD/MM/YYYY") }}</strong></span>
+                                            <span v-else class="mt-0 color3 audit-date" style="color:transparent;"><strong>00/00/0000</strong></span>
+                                            <span v-if="different.serial == 1" class="color-green audit-point">+{{ different.diff }}</span>
                                         </el-row>
                                         
                                         <h3 class="mt-0 mb-0 score color1">{{ average1 }}</h3>
@@ -57,9 +57,9 @@
                             <el-col :xs="24" :span="12" class="mt-xs-2">
                                 <el-card shadow="never" class="border-0 color-white score-card p-30px">
                                     <el-row type="flex" justify="space-between" class="score-head">
-                                        <span v-if="client_inf[1] && client_inf[1].date" class="mt-0 color3"><strong>{{  client_inf[1].date | moment("DD/MM/YYYY") }}</strong></span>
-                                        <span v-else class="mt-0 color3" style="color:transparent;"><strong>00/00/0000</strong></span>
-                                        <span v-if="different.serial == 2" class="color-green"> +{{ different.diff }}</span>
+                                        <span v-if="client_inf[1] && client_inf[1].date" class="mt-0 color3 audit-date"><strong>{{  client_inf[1].date | moment("DD/MM/YYYY") }}</strong></span>
+                                        <span v-else class="mt-0 color3 audit-date" style="color:transparent;"><strong>00/00/0000</strong></span>
+                                        <span v-if="different.serial == 2" class="color-green audit-point"> +{{ different.diff }}</span>
                                     </el-row>
                                     <h3 class="mt-0 mb-0 score color2">{{ average2 }}</h3>
                                 </el-card>
