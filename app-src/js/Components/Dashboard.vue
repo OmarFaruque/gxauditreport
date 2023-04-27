@@ -26,7 +26,7 @@
                             :picker-options="pickerOptions">
                         </el-date-picker>
                     </el-form-item>
-                    <el-form-item label="Excel" :label-width="formLabelInlineW">
+                    <el-form-item label="Audit File" :label-width="formLabelInlineW">
                         <el-row type="flex" class="item-center">
                             <el-button @click="excelFileUpload()" class="upload-demo excel-upload">
                                 <i v-if="gx_lists[editItem].excel" class="el-icon-document-remove"></i>
@@ -38,8 +38,8 @@
                 </el-col>
                 <el-col :span="12">
                     <h4 class="mt-0">Social Reviews</h4>
-                    <el-row v-for="social in gx_lists[editItem].socials" :key="social.value" type="flex" :gutter="10" justify="center">
-                        <el-col>
+                    <el-row v-for="(social, index) in gx_lists[editItem].socials" :key="social.value" type="flex" :gutter="10" justify="center">
+                        <el-col :span="11">
                             <el-form-item>
                                 <el-select class="w-100" v-model="social.label" placeholder="Select">
                                     <el-option
@@ -51,11 +51,14 @@
                                 </el-select>
                             </el-form-item>
                         </el-col>
-                        <el-col>
+                        <el-col :span="10">
                             <el-form-item>
-                                <el-input-number class="w-100" v-model="social.value" placeholder="FB Score"></el-input-number>
+                                <el-input-number :min="0" :max="100" class="w-100" v-model="social.value" placeholder="FB Score"></el-input-number>
                             </el-form-item>
                         </el-col> 
+                        <el-col :span="3">
+                            <el-button @click="removeSocialItem(index)" type="danger" icon="el-icon-circle-close" class="remove-social-item" circle></el-button>
+                        </el-col>
                     </el-row>
                     <el-row type="flex" justify="end" class="mb-1">
                         <el-button type="primary" icon="el-icon-plus" circle @click.native.prevent="addNewSocial()" >
@@ -95,13 +98,13 @@
                     <el-row style="margin-right: 1px;">
                         <el-col :span="12">
                             <el-form-item label="Onsite Staff" :label-width="formLabelWidth">
-                                <el-input-number class="w-100" v-model="gx_lists[editItem].staff" autocomplete="off"></el-input-number>
+                                <el-input-number :min="0" :max="100" class="w-100" v-model="gx_lists[editItem].staff" autocomplete="off"></el-input-number>
                             </el-form-item>
                              <el-form-item label="Sectors Numbers" :label-width="formLabelWidth">
-                                <el-input-number class="w-100" v-model="gx_lists[editItem].sector_number" autocomplete="off"></el-input-number>
+                                <el-input-number :min="0" :max="100" class="w-100" v-model="gx_lists[editItem].sector_number" autocomplete="off"></el-input-number>
                             </el-form-item>
                             <el-form-item label="Touch Points" :label-width="formLabelWidth">
-                                <el-input-number class="w-100" v-model="gx_lists[editItem].touch_points" autocomplete="off"></el-input-number>
+                                <el-input-number :min="0" :max="100" class="w-100" v-model="gx_lists[editItem].touch_points" autocomplete="off"></el-input-number>
                             </el-form-item>
                         </el-col>
                         <el-col :span="12">
@@ -383,6 +386,10 @@ export default {
         excelRemove(){
             var self = this;
             self.gx_lists[self.editItem].excel = ''
+        },
+        removeSocialItem(index){
+            var self = this;
+            self.gx_lists[self.editItem].socials.splice(index, 1)
         },
         wpMediaUpload () {
             var self = this;

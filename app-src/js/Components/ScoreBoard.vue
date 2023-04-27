@@ -153,9 +153,10 @@
       <el-container v-else>
         <el-main>
             <el-row type="flex" justify="center">
-                <el-col :span="12">
+                <el-col :span="24">
                     <el-card shadow="always" class="text-center">
                         <h4 v-if="gx_display_message">{{ gx_display_message }}</h4>
+                        <h4 v-else>Please log in to view your available data.</h4>
                     </el-card>
                 </el-col>
             </el-row>
