@@ -34,11 +34,12 @@
                             <el-col :xs="24" :span="12" class="mt-xs-1">
                                 <div class="grid-content">
                                     <el-card shadow="never" class="border-0 color-white score-card p-30px">
-                                        <el-row type="flex" justify="space-between" class="score-head">
+                                        <el-row type="flex" justify="space-between" class="score-head mb-10px">
                                             
                                             <span v-if="client_inf[0] && client_inf[0].date" class="mt-0 color3 audit-date"><strong>{{ client_inf[0].date | moment("DD/MM/YYYY") }}</strong></span>
                                             <span v-else class="mt-0 color3 audit-date" style="color:transparent;"><strong>00/00/0000</strong></span>
                                             <span v-if="different.serial == 1" class="color-green audit-point">+{{ different.diff }}</span>
+                                            <span v-if="different_minus.serial == 1" class="color-red audit-point">{{ different_minus.diff }}</span>
                                         </el-row>
                                         
                                         <h3 class="mt-0 mb-0 score color1">{{ average1 }}</h3>
@@ -56,10 +57,11 @@
                             </el-col>
                             <el-col :xs="24" :span="12" class="mt-xs-2">
                                 <el-card shadow="never" class="border-0 color-white score-card p-30px">
-                                    <el-row type="flex" justify="space-between" class="score-head">
+                                    <el-row type="flex" justify="space-between" class="score-head mb-10px">
                                         <span v-if="client_inf[1] && client_inf[1].date" class="mt-0 color3 audit-date"><strong>{{  client_inf[1].date | moment("DD/MM/YYYY") }}</strong></span>
                                         <span v-else class="mt-0 color3 audit-date" style="color:transparent;"><strong>00/00/0000</strong></span>
                                         <span v-if="different.serial == 2" class="color-green audit-point"> +{{ different.diff }}</span>
+                                        <span v-if="different_minus.serial == 2" class="color-red audit-point"> {{ different_minus.diff }}</span>
                                     </el-row>
                                     <h3 class="mt-0 mb-0 score color2">{{ average2 }}</h3>
                                 </el-card>
@@ -182,6 +184,7 @@ export default {
             available_dates: [],
             usear_login: window.gx_object.user_id > 0 ? true : false,
             different: {serial:0},
+            different_minus: {serial:0},
             series: [{
                 name: 'Net Profit',
                 data: []
@@ -216,7 +219,7 @@ export default {
                 },
                 
                 dataLabels: {
-                    enabled: true, 
+                    enabled: false, 
                     formatter: function (val) {
                         return val + "%";
                     },
@@ -367,8 +370,10 @@ export default {
                 this.average2 = temScore2.length > 0 ? (temScore2.reduce((a, b) => a + b) / temScore2.length).toFixed(1) : 0;
                 if(+this.average1 > +this.average2){
                     this.different = {serial: 1, diff: (this.average1 - this.average2).toFixed(2)}
+                    this.different_minus = {serial: 2, diff: (this.average2 - this.average1).toFixed(2)}
                 }else{
                     this.different = {serial: 2, diff: (this.average2 - this.average1).toFixed(2)}
+                    this.different_minus = {serial: 1, diff: (this.average1 - this.average2).toFixed(2)}
                 }
 
                 this.client_inf = response.results 
@@ -403,14 +408,14 @@ export default {
                 },
                 
                 dataLabels: {
-                    enabled: true, 
+                    enabled: false, 
                     formatter: function (val) {
                         return val + "%";
                     },
                     offsetX: 0,
                     offsetY: -20,
                     style: {
-                        fontSize: '12px',
+                        fontSize: '10px',
                         colors: ['#18186E']
                     }
                 },

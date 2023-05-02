@@ -3,6 +3,7 @@ import lang from 'element-ui/lib/locale/lang/en';
 import locale from 'element-ui/lib/locale';
 
 
+
 import {
     Button,
     ButtonGroup,
@@ -108,6 +109,7 @@ Vue.use(Transfer);
 Vue.use(DatePicker);
 Vue.use(Submenu);
 Vue.use(require('vue-moment'));
+
 
 Vue.use(Loading.directive);
 Vue.prototype.$loading = Loading.service;
