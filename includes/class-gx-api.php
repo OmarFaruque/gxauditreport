@@ -56,6 +56,17 @@ class GX_Api
                 );
 
 
+                //details gx lists for user in frontend
+                register_rest_route(
+                    $this->token . '/v1',
+                    '/getusergx/',
+                    array(
+                        'methods' => 'POST',
+                        'callback' => array($this, 'get_user_gx_lists'),
+                        'permission_callback' => array($this, 'getPermission'),
+                    )
+                );
+
 
                 // Save new entry to DB
                 register_rest_route(
@@ -132,6 +143,10 @@ class GX_Api
     }
 
 
+
+
+
+
     /**
      * Get settings data 
      * Query from options table 
@@ -161,18 +176,21 @@ class GX_Api
         $user_id = $data['id'];
         $v = new stdClass();
         $v->name = get_user_meta( $user_id, 'name', true );
-        $v->location = get_user_meta( $user_id, 'location', true );
         $v->gx_id = get_user_meta( $user_id, 'gx_id', true );
         $v->type = get_user_meta( $user_id, 'type', true );
-        $v->staff = get_user_meta( $user_id, 'staff', true );
-        $v->touch_points = get_user_meta( $user_id, 'touch_points', true );
-        $v->sector_number = get_user_meta( $user_id, 'sector_number', true );
         $v->logourl = get_user_meta( $user_id, 'logourl', true );
         $v->logoid = get_user_meta( $user_id, 'logoid', true );
 
         $table = $this->wpdb->prefix . 'gx_audit';
-        $qry = $this->wpdb->prepare("SELECT `items`, `socials` FROM {$table} WHERE `user_id`=%d ORDER BY `id` ASC LIMIT 1", $user_id);
+        $qry = $this->wpdb->prepare("SELECT `items`, `socials`, `location`, `staff`, `touch_points`, `sector_number` FROM {$table} WHERE `user_id`=%d ORDER BY `id` ASC LIMIT 1", $user_id);
         $dataqry = $this->wpdb->get_row($qry, OBJECT);
+        $v->location = $dataqry->location;
+        $v->staff = $dataqry->staff;
+        $v->touch_points = $dataqry->touch_points;
+        $v->sector_number = $dataqry->sector_number;
+        
+        
+
         $items = '';
         if($dataqry) $items = json_decode($dataqry->items);
         if($dataqry) $socials = json_decode($dataqry->socials);
@@ -188,9 +206,16 @@ class GX_Api
         $end_date = $data['end_date'];
 
         $qry = $this->wpdb->prepare("SELECT * FROM {$table} WHERE `user_id`=%d AND `date` != %s", $data['id'], '0000-00-00 00:00:00');
+        $location_qry = $this->wpdb->prepare("SELECT `location` FROM {$table} WHERE `user_id`=%d AND `date` != %s", $data['id'], '0000-00-00 00:00:00');
+        $locations = $this->wpdb->get_results($location_qry, OBJECT);
 
 
         $avilableQry = $qry . " GROUP BY DATE(`date`)";
+        
+        if(isset($data['location']))
+            $qry .= $this->wpdb->prepare(" AND `location`=%s", $data['location']);
+
+        
         $availableDates = $this->wpdb->get_results($avilableQry, OBJECT);
         $availableDates = array_map(function($v){
             return array(
@@ -207,7 +232,7 @@ class GX_Api
             $start_date     = date('Y-m-d', strtotime($start_date));
             $end_date       = date('Y-m-d', strtotime($end_date));
 
-            $qry .= $this->wpdb->prepare(" AND DATE(`date`) = %s OR DATE(`date`)=%s", $start_date, $end_date);    
+            $qry .= $this->wpdb->prepare(" AND (DATE(`date`) = %s OR DATE(`date`)=%s)", $start_date, $end_date);    
         }
         $qry .= $this->wpdb->prepare(" ORDER BY `date` ASC LIMIT 2");
 
@@ -215,12 +240,9 @@ class GX_Api
         $socialArray = array();
         $results = array_map(function($v) use ($socialArray){
             $v->name = get_user_meta( $v->user_id, 'name', true );
-            $v->location = get_user_meta( $v->user_id, 'location', true );
+            
             $v->gx_id = get_user_meta( $v->user_id, 'gx_id', true );
             $v->type = get_user_meta( $v->user_id, 'type', true );
-            $v->staff = get_user_meta( $v->user_id, 'staff', true );
-            $v->touch_points = get_user_meta( $v->user_id, 'touch_points', true );
-            $v->sector_number = get_user_meta( $v->user_id, 'sector_number', true );
             $v->logourl = get_user_meta( $v->user_id, 'logourl', true );
             $v->logoid = get_user_meta( $v->user_id, 'logoid', true );
             $v->socials = json_decode($v->socials);
@@ -235,7 +257,16 @@ class GX_Api
             }
         }
        
-        return new WP_REST_Response(array('available_dates' => $availableDates, 'results' => $results, 'gx_display_message' => get_option( 'gx_display_message', false ), 'socials' => $socialArray), 200);
+        return new WP_REST_Response(
+            array(
+                'available_dates' => $availableDates, 
+                'results' => $results, 
+                'gx_display_message' => get_option( 'gx_display_message', false ), 
+                'socials' => $socialArray, 
+                'locations' => $locations, 
+                'location_name' => $data['location'], 
+                'qry' => $qry
+            ), 200);
     }
 
 
@@ -265,7 +296,7 @@ class GX_Api
      * @return  success message
      */
     public function set_new_entry_to_db($data){
-        date_default_timezone_set("Asia/Dhaka");
+        // date_default_timezone_set("Asia/Dhaka");
         $data = $data['data'];
         $data['items'] = json_encode($data['items']);
         $data['socials'] = json_encode($data['socials']);
@@ -285,12 +316,10 @@ class GX_Api
             update_user_meta( $user_id, 'logoid', $data['logoid'] );
         }
 
-        unset($data['location']);
+        
         unset($data['gx_id']);
         unset($data['type']);
         unset($data['staff']);
-        unset($data['touch_points']);
-        unset($data['sector_number']);
         unset($data['logourl']);
         unset($data['logoid']);
         unset($data['name']);
@@ -325,19 +354,19 @@ class GX_Api
     /**
      * Get all score from Database 
      */
-    public function cc_get_all_score(){
+    public function cc_get_all_score($user_id = 0){
         $table = $this->wpdb->prefix . 'gx_audit';
         $qry = "SELECT * FROM {$table}";
+
+        if($user_id > 0)
+            $qry .= $this->wpdb->prepare(" WHERE `user_id`=%d", $user_id);
+
         $data = $this->wpdb->get_results($qry, OBJECT);
 
         $data = array_map(function($v){
             $v->name = get_user_meta( $v->user_id, 'name', true );
-            $v->location = get_user_meta( $v->user_id, 'location', true );
             $v->gx_id = get_user_meta( $v->user_id, 'gx_id', true );
             $v->type = get_user_meta( $v->user_id, 'type', true );
-            $v->staff = get_user_meta( $v->user_id, 'staff', true );
-            $v->touch_points = get_user_meta( $v->user_id, 'touch_points', true );
-            $v->sector_number = get_user_meta( $v->user_id, 'sector_number', true );
             $v->logourl = get_user_meta( $v->user_id, 'logourl', true );
             $v->logoid = get_user_meta( $v->user_id, 'logoid', true );
             return $v;
@@ -346,6 +375,19 @@ class GX_Api
     }
 
 
+
+
+    /**
+     * Get user all gx  lists 
+     * 
+     * @param $data array
+     */
+    public function get_user_gx_lists($data = array()){
+        $user_id = $data['user_id'];
+        $config = array();
+        $config['gx_lists'] = $this->cc_get_all_score($user_id);
+        return new WP_REST_Response($config, 200);
+    }
 
     /**
      * @access  public

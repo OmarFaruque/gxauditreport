@@ -22,9 +22,18 @@ window.PluginName.Vue.mixin({
 // });
 
 import App from './PublicApp';
+import GxLists from './GxLists';
 
-new window.PluginName.Vue({
-    el: '#gx_ui_public',
-    render: h => h(App)
-});
+if(document.getElementById('gx_ui_public')){
+    new window.PluginName.Vue({
+        el: '#gx_ui_public',
+        render: h => h(App)
+    });
+}
 
+if(document.getElementById('gx_lists')){
+    new window.PluginName.Vue({
+        el: '#gx_lists',
+        render: h => h(GxLists)
+    });
+}

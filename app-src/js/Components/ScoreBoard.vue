@@ -10,14 +10,24 @@
                         </div>
                 </el-row>
             </el-header>
-            <el-main class="mt-1">
-                <el-row class="mb-3" :gutter="20" >
+            <el-main>
+                <el-row :gutter="20" >
                     <el-col :span="12" :xs="24" :sm="24" :md="24" :lg="12" :xl="12">
-                                <h2 class="mt-3 card-title">Information:</h2>
+                                <h2 class="card-title">Information:</h2>
                                 <el-card class="border-0 pt-0 br-10px p-30px">
                                     <ul class="m-0 p-0 lists-style-none information-list">
                                         <li><strong>Client: </strong>{{ client_inf[0] ? client_inf[0].name : '' }}</li>
-                                        <li><strong>Location: </strong>{{ client_inf[0] ? client_inf[0].location : '' }}</li>
+                                        <li><strong>Outlet: </strong>
+                                            <!-- {{ client_inf[0] ? client_inf[0].location : '' }} -->
+                                            <el-select @change="locationChangeEvent($event)" class="w-10 currentLocation p-0 border-0" v-model="current_location" placeholder="Select a Outlet">
+                                                <el-option
+                                                    v-for="location in location_lists"
+                                                    :key="location.location"
+                                                    :label="location.location"
+                                                    :value="location.location">
+                                                </el-option>
+                                            </el-select>
+                                        </li>
                                         <li><strong>ID: </strong>{{ client_inf[0] ? client_inf[0].gx_id : '' }}</li>
                                         <li><strong>Type: </strong>{{ client_inf[0] ? client_inf[0].type : '' }}</li>
                                         <li><strong>Amount of Onsite Staff: </strong>{{ client_inf[0] ? client_inf[0].staff : '' }}</li>
@@ -28,7 +38,7 @@
                          
                     </el-col>
                     <el-col :xs="24" :sm="24" :md="24" :lg="12" :span="12" :xl="12">
-                        <h2 class="mt-3 card-title">Guest Experience Score(GXS):</h2>
+                        <h2 class="card-title">Guest Experience Score(GXS):</h2>
                        <el-card class="br-10px p-30px border-0">
                         <el-row :gutter="20">
                             <el-col :xs="24" :span="12" class="mt-xs-1">
@@ -78,7 +88,7 @@
                        </el-card>
                     </el-col>
                 </el-row>
-                <el-row class="mt-3">
+                <el-row>
                         <div class="chartWrap">
                             <h2 class="mb-1 card-title"><strong>Guest Journey:</strong></h2>
                             <el-card class="br-10px p-30px border-0">
@@ -91,7 +101,7 @@
                         </div>
                     
                 </el-row>
-                <el-row  class="mt-3">
+                <el-row>
                         <h2 class="mb-1 card-title"><strong>Social Reviews:</strong></h2>
                         <el-card class="br-10px plr-30px ptb-20px border-0">
                         <div class="socialWrap">
@@ -123,7 +133,7 @@
                         </div>
                     </el-card>
                 </el-row>
-                <el-row class="mt-3">
+                <el-row>
                         <h2 class="mb-1 card-title"><strong>Reports:</strong></h2>
                         <el-card class="br-10px border-0 reports">
                             <el-row type="flex" v-if="client_inf.length && client_inf[0].excel" class="item-center mb-d-block">
@@ -249,10 +259,10 @@ export default {
                 },
                 fill: {
                     opacity: 1, 
-                    colors: ['#529CFD', '#18186E']
+                    colors: ['#529CFD', '#f9c209']
                 },
                 tooltip: {
-                enabled: false,
+                enabled: true,
                 shared: false,
                 intersect: false,
                 y: {
@@ -283,7 +293,8 @@ export default {
             ]
             },
 
-          
+            location_lists: {}, 
+            current_location: '',
             client_inf: [{
                 name: '',
                 location: '',
@@ -296,7 +307,7 @@ export default {
                 logoid: '',
                 user_id: '',
                 date: '',
-                items: []    
+                items: []   
             },{}], 
             start_date: '',
             end_date: '',
@@ -321,6 +332,15 @@ export default {
        
     },
     methods: {
+        locationChangeEvent(e){
+            let data = {
+                id: window.gx_object.user_id, 
+                start_date: this.start_date, 
+                end_date: this.end_date, 
+                location: e
+            }
+            this.getData(data)
+        },
         dateChangeEvent(){
             let data = {
                 id: window.gx_object.user_id, 
@@ -332,9 +352,12 @@ export default {
         getData(data){
             this.fetchWP.post(`frontend_config`, data)
         .then((response) => { 
+
+            // console.log('locationCheck: ', response)
             this.loading = false;
             this.socials = response.socials
             this.available_dates = response.available_dates.length ? response.available_dates : []
+            this.location_lists = response.locations
 
                 // Show error if data less then 1
                 if(response.results.length <= 0){
@@ -377,7 +400,9 @@ export default {
                 }
 
                 this.client_inf = response.results 
-                
+                // if(response.results.length > 0)
+                    // this.current_location = response.results[0].location
+
                 let tempSeries = [{name: 'Item 1', data: temScore1},{name: 'Item 2', data: temScore2}];
                 
                 this.series = tempSeries;
@@ -438,17 +463,17 @@ export default {
                 },
                 fill: {
                     opacity: 1, 
-                    colors: ['#529CFD', '#18186E']
+                    colors: ['#529CFD', '#f9c209']
                 },
                 tooltip: {
-                enabled: false,
-                shared: false,
-                intersect: false,
-                y: {
-                    formatter: function (val) {
-                            return val
+                    enabled: true,
+                    shared: true,
+                    intersect: false,
+                    y: {
+                        formatter: function (val) {
+                                return val
+                            }
                         }
-                    }
                 },
                 responsive: [
                 {

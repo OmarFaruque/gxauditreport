@@ -123,7 +123,9 @@ class GX_Public
 
         //Add shortcode 
         add_shortcode( 'gx_score_board', array($this, 'gx_score_board_callback') );
-        
+
+        //ShortCode for gx lists
+        add_shortcode( 'gx_score_lists', array($this, 'gx_score_lists_callback') );
     }
     
 
@@ -134,7 +136,18 @@ class GX_Public
                 <div class="' . $this->token . '_loader"><p>' . __('Loading...', 'gx-audit') . '</p></div>
             </div>'
         );
-       
+    }
+
+
+    /**
+     * Shortcode for gx score lists 
+     */
+    public function gx_score_lists_callback(){
+        return (
+            '<div id="' . $this->token . '_lists" class="bg-white border-round-5 pb-5">
+                <div class="' . $this->token . '_loader"><p>' . __('Loading...', 'gx-audit') . '</p></div>
+            </div>'
+        );
     }
 
 
@@ -187,7 +200,6 @@ class GX_Public
                 'user_id' => get_current_user_id()
             )
         );
-        
     }
 
  

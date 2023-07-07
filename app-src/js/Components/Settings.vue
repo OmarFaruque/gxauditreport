@@ -11,7 +11,8 @@
                     <el-col :span="12">
                         <el-card shadow="always">
                             <h4>Shortcode in php</h4>
-                            <code>&lt;?php echo do_shortcode('[gx_score_board]'); ?&gt;</code>
+                            <p><span>Score Board: <code>&lt;?php echo do_shortcode('[gx_score_board]'); ?&gt;</code></span></p>
+                            <p><span>Score Lists: <code>&lt;?php echo do_shortcode('[gx_score_lists]'); ?&gt;</code></span></p>
                         </el-card>
                     </el-col>
                 </el-row>
@@ -19,7 +20,8 @@
                     <el-col :span="12">
                         <el-card shadow="always">
                             <h4>Shortcode in content</h4>
-                            <code>[gx_score_board]</code>
+                            <p><span>Score Board: <code>[gx_score_board]</code></span></p>
+                            <p><span>Score Lists: <code>[gx_score_lists]</code></span></p>
                         </el-card>
                     </el-col>
                 </el-row>

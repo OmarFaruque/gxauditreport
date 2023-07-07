@@ -232,9 +232,14 @@ class GX_Backend
         $gx_table = $prefix . 'gx_audit';
         $charset_collate = $wpdb->get_charset_collate();
 
+
         $create_gx_table_sql = "CREATE TABLE {$gx_table} (
             id int(11) NOT NULL auto_increment,
             user_id int(11) NOT NULL,
+            location varchar(200) NOT NULL,
+            staff int(11) NOT NULL,
+            touch_points int(11) NOT NULL,
+            sector_number int(11) NOT NULL,
             excel text NOT NULL,
             socials text NOT NULL,
             items text NOT NULL,

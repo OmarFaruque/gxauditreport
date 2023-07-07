@@ -77,7 +77,7 @@
                             </el-form-item>
                         </el-col>
                         <el-col :span="12">
-                            <el-form-item label="Location" :label-width="formLabelWidth">
+                            <el-form-item label="Outlet" :label-width="formLabelWidth">
                                 <el-input v-model="gx_lists[editItem].location" autocomplete="off"></el-input>
                             </el-form-item>    
                         </el-col>
@@ -208,7 +208,7 @@
                         
                         <el-table-column
                             prop="location"
-                            label="Location">
+                            label="Outlet">
                         </el-table-column>
                         <el-table-column
                             prop="type"

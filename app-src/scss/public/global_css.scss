@@ -61,6 +61,10 @@ div#gx_scoreboard_app{max-width: unset;}
 .mb-1{margin-bottom: 1rem;}
 .p-10px{padding: 10px;}
 .mb-10px{margin-bottom: 10px;}
+.p-5{padding: 5rem;}
+.p-1{padding: 1rem;}
+.pl-1{padding-left: 1rem;}
+.pr-1{padding-right: 1rem;}
 
 .el-card.p-30px{
     >.el-card__body{
@@ -121,11 +125,24 @@ h2.score, h1.score{font-size: 70px;}
 .color-green{color: green;}
 .color-red{color: red;}
 .bg-yellow{background-color: #FFC207;}
-.border-0{border-width: 0;}
+.border-0 input, .border-0{border-width: 0 !important;}
 .mw-100{max-width: 100%;}
 .border-rounded{border-radius: 500px;}
 .item-center{align-items: center;}
 .text-center{text-align: center;}
+.currentLocation{
+    input{
+    padding: 0;
+    height: 20px;
+    padding-right: 0;
+    color: black;
+     &::placeholder{color: black;}
+    }
+    span{
+        color: black;
+    }
+}
+
 
 button[type=button],
 .border-white{border-color: white;}
@@ -255,4 +272,8 @@ button[type=button],
     .mb-d-block.el-row--flex{
         display: block;
     }
+}
+
+table.el-table__header{
+    margin-bottom: 0;
 }
