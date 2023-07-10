@@ -238,10 +238,12 @@ button[type=button],
     }
     .download-btn{
         border-color: $color1 !important;
+        text-decoration: none;
         color: $color1 !important;
         border-radius: 0.375rem;
         padding: .5rem 1rem;
         background-color: transparent !important;
+        .el-image{max-width: 22px;}
         &:hover{
             background-color: $color1 !important;
             color: white !important;

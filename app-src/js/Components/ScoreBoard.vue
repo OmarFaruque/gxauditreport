@@ -145,13 +145,13 @@
                                 </el-col>
                                 <el-col :span="6" :xs="12">
                                     <el-row type="flex" justify="end">
-                                        <el-button class="d-flex item-center download-btn" @click="downloadExcel()">
-                                        <span>Download Reports &nbsp;</span>
-                                        <el-image v-if="client_inf[0]" class="justify-center"
-                                                :src="$publicAssets(`images/download-icon.png`)"
-                                                fit="fill">
-                                        </el-image>
-                                    </el-button>
+                                        <a :href="client_inf[0].excel" :download="`audit_${client_inf[0].id}`" class="el-button d-flex item-center download-btn el-button--default">
+                                            <span>Download Reports &nbsp;</span>
+                                            <el-image v-if="client_inf[0]" class="justify-center"
+                                                    :src="$publicAssets(`images/download-icon.png`)"
+                                                    fit="fill">
+                                            </el-image>
+                                        </a>
                                     </el-row>
                                 </el-col>
                             </el-row>
@@ -334,9 +334,7 @@ export default {
     methods: {
         locationChangeEvent(e){
             let data = {
-                id: window.gx_object.user_id, 
-                start_date: this.start_date, 
-                end_date: this.end_date, 
+                id: window.gx_object.user_id,
                 location: e
             }
             this.getData(data)
@@ -345,7 +343,8 @@ export default {
             let data = {
                 id: window.gx_object.user_id, 
                 start_date: this.start_date, 
-                end_date: this.end_date
+                end_date: this.end_date, 
+                location: this.current_location
             }
             this.getData(data)
         },
@@ -353,7 +352,7 @@ export default {
             this.fetchWP.post(`frontend_config`, data)
         .then((response) => { 
 
-            // console.log('locationCheck: ', response)
+            console.log('locationCheck: ', response)
             this.loading = false;
             this.socials = response.socials
             this.available_dates = response.available_dates.length ? response.available_dates : []
@@ -400,10 +399,14 @@ export default {
                 }
 
                 this.client_inf = response.results 
-                // if(response.results.length > 0)
-                    // this.current_location = response.results[0].location
 
-                let tempSeries = [{name: 'Item 1', data: temScore1},{name: 'Item 2', data: temScore2}];
+                if(response.results.length > 0)
+                    this.current_location = response.results[0].location
+
+                let tempSeries = [{name: '', data: temScore1},{name: '', data: temScore2}];
+                // let tempSeries = [{data: temScore1},{data: temScore2}];
+                
+
                 
                 this.series = tempSeries;
                 this.chartOptions = {
@@ -467,8 +470,8 @@ export default {
                 },
                 tooltip: {
                     enabled: true,
-                    shared: true,
-                    intersect: false,
+                    shared: false,
+                    intersect: true,
                     y: {
                         formatter: function (val) {
                                 return val
@@ -501,6 +504,7 @@ export default {
         downloadExcel(){
             const link = document.createElement('a')
             link.href = this.client_inf[0].excel
+            link.target = '_blank' 
             link.download = `audit_${this.client_inf[0].id}`
             link.click()
         }

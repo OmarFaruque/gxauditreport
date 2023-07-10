@@ -214,6 +214,9 @@ class GX_Api
         
         if(isset($data['location']))
             $qry .= $this->wpdb->prepare(" AND `location`=%s", $data['location']);
+        
+        if(!isset($data['location']))
+            $qry .= $this->wpdb->prepare(" AND `location`=%s", $locations[0]->location);
 
         
         $availableDates = $this->wpdb->get_results($avilableQry, OBJECT);
