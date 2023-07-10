@@ -237,7 +237,7 @@ class GX_Api
 
             $qry .= $this->wpdb->prepare(" AND (DATE(`date`) = %s OR DATE(`date`)=%s)", $start_date, $end_date);    
         }
-        $qry .= $this->wpdb->prepare(" ORDER BY `date` ASC LIMIT 2");
+        $qry .= $this->wpdb->prepare(" ORDER BY `date` DESC LIMIT 2");
 
         $results = $this->wpdb->get_results($qry);
         $socialArray = array();
